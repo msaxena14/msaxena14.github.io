@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madhavam Saxena | SRE Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Madhavam Saxena | Interactive SRE Terminal</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap');
 
@@ -23,16 +23,16 @@
             font-family: 'Fira Code', monospace;
             background-color: var(--bg-color);
             color: var(--text-main);
-            line-height: 1.7;
+            line-height: 1.6;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100dvh; /* Handles mobile URL bar retracting */
+            overflow: hidden;
         }
 
-        /* Subtle CRT Overlay */
         body::after {
             content: " ";
             display: block;
@@ -51,9 +51,11 @@
             border: 1px solid #1f2937;
             border-radius: 10px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 2px rgba(255,255,255,0.1);
-            overflow: hidden;
             position: relative;
             z-index: 3;
+            display: flex;
+            flex-direction: column;
+            height: 85dvh;
         }
 
         .terminal-header {
@@ -61,9 +63,12 @@
             padding: 12px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             border-bottom: 1px solid #1f2937;
+            user-select: none;
         }
 
+        .mac-buttons { display: flex; }
         .mac-btn {
             width: 12px;
             height: 12px;
@@ -71,396 +76,267 @@
             margin-right: 8px;
             opacity: 0.8;
         }
-        .mac-btn:hover { opacity: 1; }
         .close { background: #ff5f56; }
         .min { background: #ffbd2e; }
         .max { background: #27c93f; }
 
         .terminal-title {
-            margin: 0 auto;
             color: var(--comment);
             font-size: 0.85rem;
             letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 10px;
+        }
+        
+        .pdf-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border: 1px solid var(--blue);
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .terminal-body {
             padding: 24px;
-            height: 75vh;
+            flex-grow: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             scroll-behavior: smooth;
+            word-wrap: break-word;
+            cursor: text;
         }
 
-        /* Custom Scrollbar */
-        .terminal-body::-webkit-scrollbar { width: 8px; }
+        .terminal-body::-webkit-scrollbar { width: 6px; }
         .terminal-body::-webkit-scrollbar-track { background: var(--term-bg); }
         .terminal-body::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
-        .terminal-body::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-        .prompt { margin-bottom: 8px; }
+        .output-line { margin-bottom: 15px; }
         .user { color: var(--green); font-weight: 600; text-shadow: var(--glow); }
         .host { color: var(--blue); font-weight: 600; }
         .path { color: var(--yellow); font-weight: 600; }
-        .cmd { color: #f8fafc; }
-
-        .output {
-            margin-bottom: 30px;
-            padding-left: 12px;
-            border-left: 2px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-
-        .output:hover { border-left: 2px solid #374151; }
-
-        .motd {
-            color: var(--comment);
-            margin-bottom: 25px;
-        }
-
+        
         .highlight { color: var(--blue); }
         .success { color: var(--green); }
         .warning { color: var(--yellow); }
+        .error { color: var(--red); }
 
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .skill-item {
-            background: rgba(255,255,255,0.01);
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #1f2937;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .skill-item:hover {
-            border-color: var(--blue);
-            transform: translateY(-2px);
-            background: rgba(96, 165, 250, 0.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .job-entry {
-            margin-bottom: 16px;
-        }
-
-        .job-title-bar {
+        .input-line {
             display: flex;
-            justify-content: space-between;
-            background: rgba(31, 41, 55, 0.4);
-            padding: 12px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            user-select: none;
-            border: 1px solid transparent;
-        }
-
-        .job-title-bar:hover {
-            background: rgba(74, 222, 128, 0.1);
-            border-color: rgba(74, 222, 128, 0.2);
-        }
-
-        .indicator {
-            color: var(--comment);
-            margin-right: 8px;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        .job-title-bar:hover .indicator { color: var(--green); }
-
-        /* Smooth Accordion UX */
-        .job-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-            opacity: 0;
-            padding: 0 15px;
-            border-left: 1px dashed #374151;
-            margin-left: 20px;
-        }
-
-        .job-details.active {
-            max-height: 800px;
-            opacity: 1;
-            padding: 15px;
-            margin-top: 8px;
-        }
-
-        ul { margin: 0; padding-left: 20px; }
-        li { margin-bottom: 10px; color: #d1d5db; }
-
-        /* Terminal Style Download Button */
-        .download-btn {
-            display: inline-block;
+            align-items: center;
             margin-top: 10px;
-            padding: 8px 16px;
-            background: rgba(96, 165, 250, 0.1);
-            color: var(--blue);
-            text-decoration: none;
-            border: 1px solid var(--blue);
-            border-radius: 4px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9em;
+            flex-wrap: wrap; /* Allows stacking on mobile */
         }
 
-        .download-btn:hover {
-            background: var(--blue);
-            color: var(--bg-color);
-            box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
-            transform: translateY(-1px);
+        .prompt-text {
+            white-space: nowrap;
+            margin-right: 8px;
         }
 
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 18px;
-            background: var(--green);
-            animation: blink 1s step-end infinite;
-            vertical-align: text-bottom;
-            box-shadow: var(--glow);
+        #cmd-input {
+            background: transparent;
+            border: none;
+            color: #f8fafc;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px; /* Crucial: Prevents iOS from auto-zooming */
+            flex-grow: 1;
+            outline: none;
+            caret-color: var(--green);
+            min-width: 150px;
         }
 
-        @keyframes blink { 50% { opacity: 0; } }
-        .hidden { display: none; }
+        ul { margin: 5px 0 15px 0; padding-left: 20px; }
+        li { margin-bottom: 8px; color: #d1d5db; }
+        
+        .mobile-tap-hint {
+            display: none;
+            color: var(--comment);
+            font-style: italic;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* Mobile specific media queries */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .terminal-window { height: calc(100dvh - 20px); border-radius: 8px; }
+            .terminal-body { padding: 15px; font-size: 0.9rem; }
+            
+            /* Stack the prompt and input to give more typing space on narrow screens */
+            .prompt-text { display: block; margin-bottom: 4px; width: 100%; }
+            .input-line { flex-direction: column; align-items: flex-start; }
+            #cmd-input { width: 100%; }
+            
+            .terminal-header { padding: 10px; }
+            .mac-buttons { display: none; } /* Hide mac dots to save space for title/link */
+            
+            .mobile-tap-hint { display: block; animation: pulse 2s infinite; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
     </style>
 </head>
 <body>
 
 <div class="terminal-window">
     <div class="terminal-header">
-        <div class="mac-btn close"></div>
-        <div class="mac-btn min"></div>
-        <div class="mac-btn max"></div>
+        <div class="mac-buttons">
+            <div class="mac-btn close"></div>
+            <div class="mac-btn min"></div>
+            <div class="mac-btn max"></div>
+        </div>
         <div class="terminal-title">admin@sre-prod-server:~</div>
+        <a href="MadhavamSaxena_Resume.pdf" class="pdf-link" target="_blank">GUI Mode (PDF)</a>
     </div>
     
     <div class="terminal-body" id="term-body">
         
-        <div class="motd">
-            [ OK ] Booting System...<br>
-            [ OK ] Loading Kernel Modules...<br>
-            [ INFO ] Evaluating ROI of Regret: Zero.<br>
-            [ INFO ] System Ready... <br>
-
+        <div class="output-line" style="color: var(--comment);">
+            Last login: Sun Jun 28 18:20:25 on ttys001<br>
+            [ OK ] System initialized.<br>
+            <br>
+            Welcome to Madhavam's Interactive Resume.<br>
+            BUILT IN SILENCE. CONQUER IN PUBLIC.<br>
+            <br>
+            Type <span class="highlight">'help'</span> to see a list of available commands.
+            <div class="mobile-tap-hint">[ Tap anywhere to start typing ]</div>
         </div>
 
-        <!-- WHOAMI -->
-        <div class="prompt">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-whoami"></span><span class="cursor" id="cursor-1"></span>
-        </div>
-        
-        <div class="output hidden" id="out-whoami">
-            <h1 style="margin: 0 0 10px 0; color: var(--green); text-shadow: var(--glow);">Madhavam Saxena</h1>
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                <span><strong>Role:</strong> <span class="highlight">DEVOPS ENGINEER</span></span>
-                <span><strong>Loc:</strong> Beniganj, Ayodhya (224001)</span>
-                <span><strong>Tel:</strong> +91-6386695044</span>
-                <span><strong>Mail:</strong> madhavamsaxena14@gmail.com</span>
-            </div>
-        </div>
+        <div id="output-history"></div>
 
-        <!-- CAT SUMMARY -->
-        <div class="prompt hidden" id="prompt-summary">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-summary"></span><span class="cursor" id="cursor-2"></span>
-        </div>
-
-        <div class="output hidden" id="out-summary">
-            <p>DevOps Engineer with 3+ years of experience specialising in cloud infrastructure, containerisation, and automation. Proven expertise in AWS, Kubernetes, CI/CD, and infrastructure as code. Demonstrated success in implementing security upgrades, cost optimisation, and maintaining high-availability systems.</p>
-        </div>
-
-        <!-- LS SKILLS -->
-        <div class="prompt hidden" id="prompt-skills">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">ls -la ./skills/</span>
-        </div>
-
-        <div class="output hidden" id="out-skills">
-            <div class="skills-grid">
-                <div class="skill-item"><span class="highlight">Container_Orchestration:</span> Docker, Kubernetes</div>
-                <div class="skill-item"><span class="highlight">IaC_ConfigMgmt:</span> Ansible, Terraform</div>
-                <div class="skill-item"><span class="highlight">Programming:</span> Python, Shell Scripting</div>
-                <div class="skill-item"><span class="highlight">Cloud_AWS:</span> EC2, S3, Lambda, VPC, IAM, SQS, EKS, CloudWatch, Boto3</div>
-                <div class="skill-item"><span class="highlight">Observability:</span> ELK Stack, OpenSearch, Prometheus, Grafana</div>
-                <div class="skill-item"><span class="highlight">CI_CD_Secrets:</span> Jenkins, Vault, AWS Secret Manager</div>
-                <div class="skill-item"><span class="highlight">VCS_Tools:</span> BitBucket, Git, Helm</div>
-                <div class="skill-item"><span class="highlight">Web_OS:</span> Nginx, CentOS, Amazon Linux, Ubuntu</div>
-                <div class="skill-item"><span class="highlight">OpenSource:</span> ElastAlert</div>
-            </div>
-        </div>
-
-        <!-- SYSTEMCTL EXP -->
-        <div class="prompt hidden" id="prompt-exp">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">systemctl status jobs.service --all</span>
-            <br><span class="comment" style="font-size: 0.85em; margin-top: 5px; display: inline-block;"># Click on a service to expand logs</span>
-        </div>
-
-        <div class="output hidden" id="out-exp">
-            
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('zupee', this)">
-                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Zupee</span>
-                    <span class="warning">August 2025 - Present</span>
-                </div>
-                <div class="job-details" id="zupee">
-                    <ul>
-                        <li>Automated AWS resource management by implementing comprehensive tagging strategy for EC2 instances, EBS volumes, and ENIs, improving resource governance and cost tracking.</li>
-                        <li>Managed multi-environment Kubernetes clusters including k8s-game-stage with resource optimization across 5+ namespaces (cse-astro, cse-tp, cse-carrom, cse-cc, cse-tr).</li>
-                        <li>Successfully onboarded 17+ microservices to Astro / Reels platform including payment, notification, user, & chat services, streamlining deployment processes.</li>
-                        <li>Contributed to DevOps strategy implementation through infrastructure automation and cost optimization initiatives.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('monotype', this)">
-                    <span><span class="indicator">[ + ]</span> Site Reliability Engineer-II @ Monotype Solutions</span>
-                    <span class="warning">August 2024 - July 2025</span>
-                </div>
-                <div class="job-details" id="monotype">
-                    <ul>
-                        <li>Engineered log management using the ELK stack, enhancing the Filebeat configuration for improved log processing and saved upto 5% of disk space.</li>
-                        <li>Diagnosed and resolved high latency from 72ms to 40ms and recurring errors to improve system performance and reliability.</li>
-                        <li>Enforced HSTS policies ensuring secure HTTPS communication across 100% of web traffic.</li>
-                        <li>Optimized Horizontal Pod Autoscaler (HPA) to handle load spikes during deployments with 0 downtime.</li>
-                        <li>Achieved $22K annual savings by optimizing CloudTrail logs and event history.</li>
-                        <li>Introduced and standardized documentation practices while providing technical mentorship to junior team members through comprehensive knowledge transfer sessions on Terraform, Ansible, and Kubernetes, enhancing team capability, reducing onboarding time, and streamlining processes across teams.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('paytm', this)">
-                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Paytm</span>
-                    <span class="warning">November 2021 - July 2024</span>
-                </div>
-                <div class="job-details" id="paytm">
-                    <ul>
-                        <li>Provisioned scalable infrastructure via Terraform: IAM roles, ASGs, ALBs, target groups, and S3 buckets.</li>
-                        <li>Streamlined CI/CD pipelines by developing Jenkins jobs, integrated with S3, Ansible, and Shell scripts, driving automation and deployment efficiency.</li>
-                        <li>Automated pre-billing reports with Python (Boto3), improving accuracy and eliminating manual overhead.</li>
-                        <li>Integrated ElastAlert with ElasticSearch for monitoring 4xx/5xx API errors, strengthening system reliability and observability.</li>
-                        <li>Migrated legacy apps from AMD-based CentOS to ARM-based Amazon EC2 Linux, reducing costs and enhancing performance.</li>
-                        <li>Implemented HashiCorp Vault over auto-scaling groups, enabling HA infrastructure and secure secrets management.</li>
-                        <li>Instrumented CloudWatch alerting on target groups via Terraform, ensuring faster response to system health events.</li>
-                        <li>Managed AWS account migration for 3 business-critical apps with 0 downtime and complete dependency handover.</li>
-                        <li>Executed patching initiative, implemented Packer for automated AMI builds, clearing 1.5-year security backlog with implementation of security best practices and compliance frameworks.</li>
-                        <li>Drove 5% vertical-wide AWS cost reduction by identifying and decommissioning unused AMIs, snapshots, and volumes.</li>
-                    </ul>
-                </div>
-            </div>
-
-             <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('edu', this)">
-                    <span><span class="indicator">[ + ]</span> B.Tech Computer Science @ State University</span>
-                    <span class="warning">September 2018 - May 2022</span>
-                </div>
-                <div class="job-details" id="edu">
-                    <ul>
-                        <li>Score: 83.4%</li>
-                        <li><span class="success">[OK]</span> Degree verification complete.</li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- WGET DOWNLOAD PDF -->
-        <div class="prompt hidden" id="prompt-download">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">wget -q --show-progress ./MadhavamSaxena_Resume.pdf</span>
-        </div>
-
-        <div class="output hidden" id="out-download">
-            <span style="color: var(--comment);">100% [======================================>] 124,512  --.-KB/s   in 0.02s</span><br>
-            <a href="MadhavamSaxena_Resume.pdf" class="download-btn" download>[ Download Traditional PDF ]</a>
-        </div>
-        
-        <!-- FINAL PROMPT -->
-        <div class="prompt hidden" id="prompt-final">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cursor"></span>
+        <div class="input-line">
+            <span class="prompt-text"><span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$</span>
+            <!-- Removed autofocus so mobile keyboards don't instantly pop up and ruin the layout -->
+            <input type="text" id="cmd-input" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="none">
         </div>
 
     </div>
 </div>
 
 <script>
-    // Smooth scroll to bottom function
-    function scrollToBottom() {
-        const termBody = document.getElementById('term-body');
-        termBody.scrollTop = termBody.scrollHeight;
-    }
+    const inputField = document.getElementById('cmd-input');
+    const historyDiv = document.getElementById('output-history');
+    const termBody = document.getElementById('term-body');
 
-    // UX: Accordion Logic with UI cues
-    function toggleJob(id, element) {
-        const details = document.getElementById(id);
-        const indicator = element.querySelector('.indicator');
-        
-        if (details.classList.contains('active')) {
-            details.classList.remove('active');
-            indicator.innerText = '[ + ]';
-        } else {
-            details.classList.add('active');
-            indicator.innerText = '[ - ]';
-            // Scroll to the opened job slightly to ensure visibility
-            setTimeout(() => {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 50);
-        }
-    }
+    // Ensure tapping anywhere in the terminal body focuses the input
+    termBody.addEventListener('click', function() {
+        inputField.focus();
+    });
 
-    // Typing effect logic
-    function typeWriter(text, elementId, speed, callback) {
-        let i = 0;
-        const elem = document.getElementById(elementId);
-        function type() {
-            if (i < text.length) {
-                elem.innerHTML += text.charAt(i);
-                i++;
-                scrollToBottom();
-                setTimeout(type, speed);
-            } else if (callback) {
-                setTimeout(callback, 200);
-            }
-        }
-        type();
-    }
-
-    // Animation Sequence on Load
-    window.onload = () => {
-        setTimeout(() => {
-            typeWriter('whoami', 'type-whoami', 80, () => {
-                document.getElementById('cursor-1').style.display = 'none';
-                document.getElementById('out-whoami').classList.remove('hidden');
-                document.getElementById('prompt-summary').classList.remove('hidden');
-                scrollToBottom();
-                
-                setTimeout(() => {
-                    typeWriter('cat summary.txt', 'type-summary', 60, () => {
-                        document.getElementById('cursor-2').style.display = 'none';
-                        document.getElementById('out-summary').classList.remove('hidden');
-                        scrollToBottom();
-                        
-                        setTimeout(() => {
-                            // Instant reveal for the rest to respect user's time
-                            document.getElementById('prompt-skills').classList.remove('hidden');
-                            document.getElementById('out-skills').classList.remove('hidden');
-                            document.getElementById('prompt-exp').classList.remove('hidden');
-                            document.getElementById('out-exp').classList.remove('hidden');
-                            document.getElementById('prompt-download').classList.remove('hidden');
-                            document.getElementById('out-download').classList.remove('hidden');
-                            document.getElementById('prompt-final').classList.remove('hidden');
-                            scrollToBottom();
-                        }, 400);
-                    });
-                }, 400);
-            });
-        }, 800);
+    // Data Structure for the Resume
+    const resumeData = {
+        whoami: `
+            <h2 style="margin: 0 0 10px 0; color: var(--green); text-shadow: var(--glow);">Madhavam Saxena[cite: 1]</h2>
+            <p><strong>Role:</strong> <span class="highlight">DEVOPS ENGINEER[cite: 1]</span></p>
+            <p><strong>Location:</strong> Beniganj, Ayodhya (224001)[cite: 1]</p>
+            <p><strong>Contact:</strong> +91-6386695044[cite: 1] | madhavamsaxena14@gmail.com[cite: 1]</p>
+            <p>DevOps Engineer with 3+ years of experience specialising in cloud infrastructure, containerisation, and automation[cite: 1].</p>
+        `,
+        skills: `
+            <div style="margin-bottom: 15px;">
+                <p><strong><span class="highlight">Orchestration:</span></strong> Docker, Kubernetes[cite: 1]</p>
+                <p><strong><span class="highlight">IaC & Config:</span></strong> Ansible, Terraform[cite: 1]</p>
+                <p><strong><span class="highlight">Cloud (AWS):</span></strong> EC2, S3, Lambda, VPC, IAM, EKS, CloudWatch, Boto3[cite: 1]</p>
+                <p><strong><span class="highlight">Observability:</span></strong> ELK Stack, OpenSearch, Prometheus, Grafana[cite: 1]</p>
+                <p><strong><span class="highlight">CI/CD & Sec:</span></strong> Jenkins, Vault, AWS Secret Manager[cite: 1]</p>
+                <p><strong><span class="highlight">Programming:</span></strong> Python, Shell Scripting[cite: 1]</p>
+            </div>
+        `,
+        experience: `
+            <p><span class="success">●</span> <strong>DevOps Engineer @ Zupee[cite: 1]</strong> <span class="warning">(Aug 2025 - Present)[cite: 1]</span></p>
+            <ul>
+                <li>Automated AWS resource management via comprehensive tagging strategy[cite: 1].</li>
+                <li>Managed multi-environment Kubernetes clusters (k8s-game-stage) across 5+ namespaces[cite: 1].</li>
+                <li>Onboarded 17+ microservices to Astro / Reels platform[cite: 1].</li>
+            </ul>
+            <p><span class="success">●</span> <strong>Site Reliability Engineer-II @ Monotype Solutions[cite: 1]</strong> <span class="warning">(Aug 2024 - Jul 2025)[cite: 1]</span></p>
+            <ul>
+                <li>Engineered log management using ELK stack, saving 5% disk space[cite: 1].</li>
+                <li>Diagnosed/resolved high latency from 72ms to 40ms[cite: 1].</li>
+                <li>Achieved $22K annual savings by optimizing CloudTrail logs[cite: 1].</li>
+            </ul>
+            <p><span class="success">●</span> <strong>DevOps Engineer @ Paytm[cite: 1]</strong> <span class="warning">(Nov 2021 - Jul 2024)[cite: 1]</span></p>
+            <ul>
+                <li>Provisioned scalable infrastructure via Terraform (ASGs, ALBs, IAM)[cite: 1].</li>
+                <li>Automated pre-billing reports with Python (Boto3)[cite: 1].</li>
+                <li>Migrated legacy apps from AMD CentOS to ARM Amazon EC2 Linux[cite: 1].</li>
+            </ul>
+        `,
+        education: `
+            <p><strong>B.Tech Computer Science Engineering</strong> @ State University[cite: 1] <span class="warning">(Sep 2018 - May 2022)[cite: 1]</span></p>
+            <p>Score: 83.4%[cite: 1] - <span class="success">[VERIFIED]</span></p>
+        `,
+        socials: `
+            <p>Currently Building in Public. Check out the latest deployments:</p>
+            <p>🔗 <a href="#" style="color: var(--blue);">LinkedIn</a></p>
+            <p>🔗 <a href="#" style="color: var(--blue);">Instagram (Building in Public Series)</a></p>
+            <p>🔗 <a href="#" style="color: var(--blue);">YouTube (Stoic/Mindset Tech Content)</a></p>
+        `,
+        help: `
+            <p>Available commands:</p>
+            <ul style="list-style-type: none; padding-left: 0;">
+                <li><span class="highlight">whoami</span>     - Display core profile and summary</li>
+                <li><span class="highlight">skills</span>     - List technical competencies</li>
+                <li><span class="highlight">experience</span> - Show employment history</li>
+                <li><span class="highlight">education</span>  - Display academic background</li>
+                <li><span class="highlight">socials</span>    - Links to online profiles and content</li>
+                <li><span class="highlight">clear</span>      - Clear the terminal screen</li>
+                <li><span class="highlight">sudo</span>       - Execute a command as superuser</li>
+            </ul>
+        `
     };
+
+    // Command Parser
+    inputField.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const rawCmd = this.value;
+            const cmd = rawCmd.trim().toLowerCase();
+            this.value = ''; // Clear input
+
+            // Print the command that was typed
+            const promptHTML = `
+                <div class="output-line" style="margin-top: 15px;">
+                    <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ ${rawCmd}
+                </div>`;
+            historyDiv.innerHTML += promptHTML;
+
+            // Process Command
+            let responseHTML = '';
+            
+            if (cmd === 'clear') {
+                historyDiv.innerHTML = '';
+                termBody.scrollTop = termBody.scrollHeight;
+                return;
+            } else if (resumeData[cmd]) {
+                responseHTML = `<div class="output-line">${resumeData[cmd]}</div>`;
+            } else if (cmd.startsWith('sudo ')) {
+                responseHTML = `<div class="output-line"><span class="error">Permission denied:</span> user 'admin' is not in the sudoers file. This incident will be reported.</div>`;
+            } else if (cmd === 'ping') {
+                responseHTML = `<div class="output-line">PONG. Server is alive and building.</div>`;
+            } else if (cmd === '') {
+                responseHTML = ''; // Do nothing on empty enter
+            } else {
+                responseHTML = `<div class="output-line"><span class="error">bash: ${cmd}: command not found</span>. Type 'help' for available commands.</div>`;
+            }
+
+            // Append response and scroll down
+            if (responseHTML) {
+                historyDiv.innerHTML += responseHTML;
+            }
+            // Small timeout to ensure DOM update before scrolling
+            setTimeout(() => {
+                termBody.scrollTop = termBody.scrollHeight;
+            }, 10);
+        }
+    });
 </script>
 
 </body>
