@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madhavam Saxena | SRE Terminal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-color: #090b10;
+            --term-bg: #11151c;
+            --text-main: #a9b7c6;
+            --green: #4ade80;
+            --blue: #60a5fa;
+            --yellow: #fbbf24;
+            --red: #f87171;
+            --comment: #6b7280;
+            --glow: 0 0 4px rgba(74, 222, 128, 0.2);
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Subtle CRT Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .terminal-window {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--term-bg);
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 2px rgba(255,255,255,0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 3;
+        }
+
+        .terminal-header {
+            background: #0d1117;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .mac-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+        .mac-btn:hover { opacity: 1; }
+        .close { background: #ff5f56; }
+        .min { background: #ffbd2e; }
+        .max { background: #27c93f; }
+
+        .terminal-title {
+            margin: 0 auto;
+            color: var(--comment);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .terminal-body {
+            padding: 24px;
+            height: 75vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        .terminal-body::-webkit-scrollbar { width: 8px; }
+        .terminal-body::-webkit-scrollbar-track { background: var(--term-bg); }
+        .terminal-body::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        .terminal-body::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+        .prompt { margin-bottom: 8px; }
+        .user { color: var(--green); font-weight: 600; text-shadow: var(--glow); }
+        .host { color: var(--blue); font-weight: 600; }
+        .path { color: var(--yellow); font-weight: 600; }
+        .cmd { color: #f8fafc; }
+
+        .output {
+            margin-bottom: 30px;
+            padding-left: 12px;
+            border-left: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .output:hover { border-left: 2px solid #374151; }
+
+        .motd {
+            color: var(--comment);
+            margin-bottom: 25px;
+        }
+
+        .highlight { color: var(--blue); }
+        .success { color: var(--green); }
+        .warning { color: var(--yellow); }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .skill-item {
+            background: rgba(255,255,255,0.01);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #1f2937;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .skill-item:hover {
+            border-color: var(--blue);
+            transform: translateY(-2px);
+            background: rgba(96, 165, 250, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .job-entry {
+            margin-bottom: 16px;
+        }
+
+        .job-title-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(31, 41, 55, 0.4);
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            user-select: none;
+            border: 1px solid transparent;
+        }
+
+        .job-title-bar:hover {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: rgba(74, 222, 128, 0.2);
+        }
+
+        .indicator {
+            color: var(--comment);
+            margin-right: 8px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .job-title-bar:hover .indicator { color: var(--green); }
+
+        /* Smooth Accordion UX */
+        .job-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 0;
+            padding: 0 15px;
+            border-left: 1px dashed #374151;
+            margin-left: 20px;
+        }
+
+        .job-details.active {
+            max-height: 800px;
+            opacity: 1;
+            padding: 15px;
+            margin-top: 8px;
+        }
+
+        ul { margin: 0; padding-left: 20px; }
+        li { margin-bottom: 10px; color: #d1d5db; }
+
+        /* Terminal Style Download Button */
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(96, 165, 250, 0.1);
+            color: var(--blue);
+            text-decoration: none;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .download-btn:hover {
+            background: var(--blue);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--green);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            box-shadow: var(--glow);
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="terminal-window">
+    <div class="terminal-header">
+        <div class="mac-btn close"></div>
+        <div class="mac-btn min"></div>
+        <div class="mac-btn max"></div>
+        <div class="terminal-title">admin@sre-prod-server:~</div>
+    </div>
+    
+    <div class="terminal-body" id="term-body">
+        
+        <div class="motd">
+            [ OK ] Booting System...<br>
+            [ OK ] Loading Kernel Modules...<br>
+            [ INFO ] Evaluating ROI of Regret: Zero.<br>
+            // MOTD: BUILT IN SILENCE. CONQUER IN PUBLIC.
+        </div>
+
+        <!-- WHOAMI -->
+        <div class="prompt">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-whoami"></span><span class="cursor" id="cursor-1"></span>
+        </div>
+        
+        <div class="output hidden" id="out-whoami">
+            <h1 style="margin: 0 0 10px 0; color: var(--green); text-shadow: var(--glow);">Madhavam Saxena</h1>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <span><strong>Role:</strong> <span class="highlight">DEVOPS ENGINEER</span></span>
+                <span><strong>Loc:</strong> Beniganj, Ayodhya (224001)</span>
+                <span><strong>Tel:</strong> +91-6386695044</span>
+                <span><strong>Mail:</strong> madhavamsaxena14@gmail.com</span>
+            </div>
+        </div>
+
+        <!-- CAT SUMMARY -->
+        <div class="prompt hidden" id="prompt-summary">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-summary"></span><span class="cursor" id="cursor-2"></span>
+        </div>
+
+        <div class="output hidden" id="out-summary">
+            <p>DevOps Engineer with 3+ years of experience specialising in cloud infrastructure, containerisation, and automation. Proven expertise in AWS, Kubernetes, CI/CD, and infrastructure as code. Demonstrated success in implementing security upgrades, cost optimisation, and maintaining high-availability systems.</p>
+        </div>
+
+        <!-- LS SKILLS -->
+        <div class="prompt hidden" id="prompt-skills">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">ls -la ./skills/</span>
+        </div>
+
+        <div class="output hidden" id="out-skills">
+            <div class="skills-grid">
+                <div class="skill-item"><span class="highlight">Container_Orchestration:</span> Docker, Kubernetes</div>
+                <div class="skill-item"><span class="highlight">IaC_ConfigMgmt:</span> Ansible, Terraform</div>
+                <div class="skill-item"><span class="highlight">Programming:</span> Python, Shell Scripting</div>
+                <div class="skill-item"><span class="highlight">Cloud_AWS:</span> EC2, S3, Lambda, VPC, IAM, SQS, EKS, CloudWatch, Boto3</div>
+                <div class="skill-item"><span class="highlight">Observability:</span> ELK Stack, OpenSearch, Prometheus, Grafana</div>
+                <div class="skill-item"><span class="highlight">CI_CD_Secrets:</span> Jenkins, Vault, AWS Secret Manager</div>
+                <div class="skill-item"><span class="highlight">VCS_Tools:</span> BitBucket, Git, Helm</div>
+                <div class="skill-item"><span class="highlight">Web_OS:</span> Nginx, CentOS, Amazon Linux, Ubuntu</div>
+                <div class="skill-item"><span class="highlight">OpenSource:</span> ElastAlert</div>
+            </div>
+        </div>
+
+        <!-- SYSTEMCTL EXP -->
+        <div class="prompt hidden" id="prompt-exp">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">systemctl status jobs.service --all</span>
+            <br><span class="comment" style="font-size: 0.85em; margin-top: 5px; display: inline-block;"># Click on a service to expand logs</span>
+        </div>
+
+        <div class="output hidden" id="out-exp">
+            
+            <div class="job-entry">
+                <div class="job-title-bar" onclick="toggleJob('zupee', this)">
+                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Zupee</span>
+                    <span class="warning">August 2025 - Present</span>
+                </div>
+                <div class="job-details" id="zupee">
+                    <ul>
+                        <li>Automated AWS resource management by implementing comprehensive tagging strategy for EC2 instances, EBS volumes, and ENIs, improving resource governance and cost tracking.</li>
+                        <li>Managed multi-environment Kubernetes clusters including k8s-game-stage with resource optimization across 5+ namespaces (cse-astro, cse-tp, cse-carrom, cse-cc, cse-tr).</li>
+                        <li>Successfully onboarded 17+ microservices to Astro / Reels platform including payment, notification, user, & chat services, streamlining deployment processes.</li>
+                        <li>Contributed to DevOps strategy implementation through infrastructure automation and cost optimization initiatives.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job-entry">
+                <div class="job-title-bar" onclick="toggleJob('monotype', this)">
+                    <span><span class="indicator">[ + ]</span> Site Reliability Engineer-II @ Monotype Solutions</span>
+                    <span class="warning">August 2024 - July 2025</span>
+                </div>
+                <div class="job-details" id="monotype">
+                    <ul>
+                        <li>Engineered log management using the ELK stack, enhancing the Filebeat configuration for improved log processing and saved upto 5% of disk space.</li>
+                        <li>Diagnosed and resolved high latency from 72ms to 40ms and recurring errors to improve system performance and reliability.</li>
+                        <li>Enforced HSTS policies ensuring secure HTTPS communication across 100% of web traffic.</li>
+                        <li>Optimized Horizontal Pod Autoscaler (HPA) to handle load spikes during deployments with 0 downtime.</li>
+                        <li>Achieved $22K annual savings by optimizing CloudTrail logs and event history.</li>
+                        <li>Introduced and standardized documentation practices while providing technical mentorship to junior team members through comprehensive knowledge transfer sessions on Terraform, Ansible, and Kubernetes, enhancing team capability, reducing onboarding time, and streamlining processes across teams.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job-entry">
+                <div class="job-title-bar" onclick="toggleJob('paytm', this)">
+                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Paytm</span>
+                    <span class="warning">November 2021 - July 2024</span>
+                </div>
+                <div class="job-details" id="paytm">
+                    <ul>
+                        <li>Provisioned scalable infrastructure via Terraform: IAM roles, ASGs, ALBs, target groups, and S3 buckets.</li>
+                        <li>Streamlined CI/CD pipelines by developing Jenkins jobs, integrated with S3, Ansible, and Shell scripts, driving automation and deployment efficiency.</li>
+                        <li>Automated pre-billing reports with Python (Boto3), improving accuracy and eliminating manual overhead.</li>
+                        <li>Integrated ElastAlert with ElasticSearch for monitoring 4xx/5xx API errors, strengthening system reliability and observability.</li>
+                        <li>Migrated legacy apps from AMD-based CentOS to ARM-based Amazon EC2 Linux, reducing costs and enhancing performance.</li>
+                        <li>Implemented HashiCorp Vault over auto-scaling groups, enabling HA infrastructure and secure secrets management.</li>
+                        <li>Instrumented CloudWatch alerting on target groups via Terraform, ensuring faster response to system health events.</li>
+                        <li>Managed AWS account migration for 3 business-critical apps with 0 downtime and complete dependency handover.</li>
+                        <li>Executed patching initiative, implemented Packer for automated AMI builds, clearing 1.5-year security backlog with implementation of security best practices and compliance frameworks.</li>
+                        <li>Drove 5% vertical-wide AWS cost reduction by identifying and decommissioning unused AMIs, snapshots, and volumes.</li>
+                    </ul>
+                </div>
+            </div>
+
+             <div class="job-entry">
+                <div class="job-title-bar" onclick="toggleJob('edu', this)">
+                    <span><span class="indicator">[ + ]</span> B.Tech Computer Science @ State University</span>
+                    <span class="warning">September 2018 - May 2022</span>
+                </div>
+                <div class="job-details" id="edu">
+                    <ul>
+                        <li>Score: 83.4%</li>
+                        <li><span class="success">[OK]</span> Degree verification complete.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- WGET DOWNLOAD PDF -->
+        <div class="prompt hidden" id="prompt-download">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">wget -q --show-progress ./MadhavamSaxena_Resume.pdf</span>
+        </div>
+
+        <div class="output hidden" id="out-download">
+            <span style="color: var(--comment);">100% [======================================>] 124,512  --.-KB/s   in 0.02s</span><br>
+            <a href="MadhavamSaxena_Resume.pdf" class="download-btn" download>[ Download Traditional PDF ]</a>
+        </div>
+        
+        <!-- FINAL PROMPT -->
+        <div class="prompt hidden" id="prompt-final">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cursor"></span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Smooth scroll to bottom function
+    function scrollToBottom() {
+        const termBody = document.getElementById('term-body');
+        termBody.scrollTop = termBody.scrollHeight;
+    }
+
+    // UX: Accordion Logic with UI cues
+    function toggleJob(id, element) {
+        const details = document.getElementById(id);
+        const indicator = element.querySelector('.indicator');
+        
+        if (details.classList.contains('active')) {
+            details.classList.remove('active');
+            indicator.innerText = '[ + ]';
+        } else {
+            details.classList.add('active');
+            indicator.innerText = '[ - ]';
+            // Scroll to the opened job slightly to ensure visibility
+            setTimeout(() => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+    }
+
+    // Typing effect logic
+    function typeWriter(text, elementId, speed, callback) {
+        let i = 0;
+        const elem = document.getElementById(elementId);
+        function type() {
+            if (i < text.length) {
+                elem.innerHTML += text.charAt(i);
+                i++;
+                scrollToBottom();
+                setTimeout(type, speed);
+            } else if (callback) {
+                setTimeout(callback, 200);
+            }
+        }
+        type();
+    }
+
+    // Animation Sequence on Load
+    window.onload = () => {
+        setTimeout(() => {
+            typeWriter('whoami', 'type-whoami', 80, () => {
+                document.getElementById('cursor-1').style.display = 'none';
+                document.getElementById('out-whoami').classList.remove('hidden');
+                document.getElementById('prompt-summary').classList.remove('hidden');
+                scrollToBottom();
+                
+                setTimeout(() => {
+                    typeWriter('cat summary.txt', 'type-summary', 60, () => {
+                        document.getElementById('cursor-2').style.display = 'none';
+                        document.getElementById('out-summary').classList.remove('hidden');
+                        scrollToBottom();
+                        
+                        setTimeout(() => {
+                            // Instant reveal for the rest to respect user's time
+                            document.getElementById('prompt-skills').classList.remove('hidden');
+                            document.getElementById('out-skills').classList.remove('hidden');
+                            document.getElementById('prompt-exp').classList.remove('hidden');
+                            document.getElementById('out-exp').classList.remove('hidden');
+                            document.getElementById('prompt-download').classList.remove('hidden');
+                            document.getElementById('out-download').classList.remove('hidden');
+                            document.getElementById('prompt-final').classList.remove('hidden');
+                            scrollToBottom();
+                        }, 400);
+                    });
+                }, 400);
+            });
+        }, 800);
+    };
+</script>
+
+</body>
+</html>
