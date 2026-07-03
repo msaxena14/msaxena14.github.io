@@ -387,19 +387,19 @@
                 </div>
             </div>
 
-             <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('edu', this)">
-                    <span><span class="indicator">[ + ]</span> Bachelor of Computer Science Engineering @ State University</span>
-                    <span class="warning">September 2018 - May 2022</span>
-                </div>
-                <div class="job-details" id="edu">
-                    <ul>
-                        <li>Score: 83.4%</li>
-                        <li><span class="success">[OK]</span> Degree verification complete.</li>
-                    </ul>
-                </div>
-            </div>
+        </div>
 
+        <!-- EDUCATION PACKAGE BLOCK -->
+        <div class="prompt hidden" id="prompt-edu">
+            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">apt show degree-btech-cs</span>
+        </div>
+        
+        <div class="output hidden" id="out-edu" style="font-size: 0.95em;">
+            <div><span class="highlight">Package:</span> degree-btech-cs</div>
+            <div><span class="highlight">Status:</span> install ok installed <span class="success">[VERIFIED]</span></div>
+            <div><span class="highlight">Maintainer:</span> State University (2018 - 2022)</div>
+            <div><span class="highlight">Performance Metric:</span> 83.4%</div>
+            <div><span class="highlight">Description:</span> Core foundational engineering coursework providing fundamental principles of Computer Science, algorithms, and systems architectures.</div>
         </div>
 
         <!-- WGET DOWNLOAD PDF -->
@@ -483,6 +483,8 @@
                             document.getElementById('out-skills').classList.remove('hidden');
                             document.getElementById('prompt-exp').classList.remove('hidden');
                             document.getElementById('out-exp').classList.remove('hidden');
+                            document.getElementById('prompt-edu').classList.remove('hidden');
+                            document.getElementById('out-edu').classList.remove('hidden');
                             document.getElementById('prompt-download').classList.remove('hidden');
                             document.getElementById('out-download').classList.remove('hidden');
                             document.getElementById('prompt-final').classList.remove('hidden');
