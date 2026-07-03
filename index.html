@@ -208,7 +208,7 @@
         }
 
         .job-details.active {
-            max-height: 1000px;
+            max-height: 1200px;
             opacity: 1;
             padding: 15px;
             margin-top: 8px;
@@ -286,7 +286,7 @@
         </div>
 
         <div class="output hidden" id="out-summary">
-            <p>DevOps Engineer with 3+ years of experience specialising in cloud infrastructure, containerisation, and automation. Proven expertise in AWS, Kubernetes, CI/CD, and infrastructure as code. Demonstrated success in implementing security upgrades, cost optimisation, and maintaining high-availability systems.</p>
+            <p>DevOps Engineer with 4+ years of experience specialising in cloud infrastructure, containerisation, and automation. Proven expertise in AWS, Kubernetes, CI/CD, and infrastructure as code. Demonstrated success in implementing security upgrades, cost optimisation, and maintaining high-availability systems.</p>
         </div>
 
         <!-- LS SKILLS -->
@@ -296,13 +296,13 @@
 
         <div class="output hidden" id="out-skills">
             <div class="skills-grid">
-                <div class="skill-item"><span class="highlight">Container_Orchestration:</span> Docker, Kubernetes</div>
+                <div class="skill-item"><span class="highlight">Container_Orchestration:</span> Docker, Kubernetes, Cilium CNI</div>
                 <div class="skill-item"><span class="highlight">IaC_ConfigMgmt:</span> Ansible, Terraform</div>
                 <div class="skill-item"><span class="highlight">Programming:</span> Python, Shell Scripting</div>
-                <div class="skill-item"><span class="highlight">Cloud_AWS:</span> EC2, S3, Lambda, VPC, IAM, SQS, EKS, CloudWatch, Boto3</div>
-                <div class="skill-item"><span class="highlight">Observability:</span> ELK Stack, OpenSearch, Prometheus, Grafana</div>
-                <div class="skill-item"><span class="highlight">CI_CD_Secrets:</span> Jenkins, Vault, AWS Secret Manager</div>
-                <div class="skill-item"><span class="highlight">VCS_Tools:</span> BitBucket, Git, Helm</div>
+                <div class="skill-item"><span class="highlight">Cloud_Services:</span> AWS EC2, S3, Lambda, VPC, IAM, SQS, EKS, CloudWatch, SDK (Boto3), Azure</div>
+                <div class="skill-item"><span class="highlight">Logging_Monitoring:</span> ELK Stack, OpenSearch, Prometheus, Grafana, Opentelemetry</div>
+                <div class="skill-item"><span class="highlight">CI_CD_Secrets:</span> Jenkins, HashiCorp Vault, AWS Secret Manager</div>
+                <div class="skill-item"><span class="highlight">VCS_Tools:</span> GitLab, Git, BitBucket, Helm</div>
                 <div class="skill-item"><span class="highlight">Web_OS:</span> Nginx, CentOS, Amazon Linux, Ubuntu</div>
                 <div class="skill-item"><span class="highlight">OpenSource:</span> ElastAlert</div>
             </div>
@@ -317,9 +317,27 @@
         <div class="output hidden" id="out-exp">
             
             <div class="job-entry">
+                <div class="job-title-bar" onclick="toggleJob('innovaccer', this)">
+                    <span><span class="indicator">[ + ]</span> Site Reliability Engineer-I @ Innovaccer</span>
+                    <span class="warning">Oct 2025 - Present</span>
+                </div>
+                <div class="job-details" id="innovaccer">
+                    <ul>
+                        <li>Orchestrated the enterprise-wide rollout of Cilium CNI across 55+ distinct multi-tenant environments, enhancing cluster networking efficiency, implementing namespace-scoped pod isolation, and hardening network security frameworks.</li>
+                        <li>Deployed Karpenter autoscaling engines across 55+ production client environments, reducing node provisioning latency, optimizing compute resource scheduling, and slashing cloud expenditure.</li>
+                        <li>Led a massive EKS 1.33 upgrade campaign across 13+ production clusters, patching runtime deployment blocks and post-upgrade validation tool in Claude Code, utilizing automated pod-status differential snapshots eliminating manual verification.</li>
+                        <li>Authored enterprise platform blueprints and GitOps deep dives for the GitLab stack.</li>
+                        <li>Leveraged advanced Kubernetes Database Operators to automate lifecycle governance setups for business-critical databases.</li>
+                        <li>Led the urgent, successful mitigation of a catastrophic, business-critical AWS MSK Kafka broker failure, performing root-cause analysis to prevent future unstability.</li>
+                        <li>Anchored high-stakes, 24x7 site reliability operations across overlapping evening and night shifts, serving as the primary escalation engineering lead for critical tier-1 production outages.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="job-entry">
                 <div class="job-title-bar" onclick="toggleJob('zupee', this)">
                     <span><span class="indicator">[ + ]</span> DevOps Engineer @ Zupee</span>
-                    <span class="warning">August 2025 - Present</span>
+                    <span class="warning">August 2025 - Oct 2025</span>
                 </div>
                 <div class="job-details" id="zupee">
                     <ul>
@@ -338,7 +356,7 @@
                 </div>
                 <div class="job-details" id="monotype">
                     <ul>
-                        <li>Engineered log management using the ELK stack, enhancing the Filebeat configuration for improved log processing and saved upto 5% of disk space.</li>
+                        <li>Engineered log management using the ELK stack, enhancing the Filebeat configuration for improved log processing and saved up to 5% of disk space.</li>
                         <li>Diagnosed and resolved high latency from 72ms to 40ms and recurring errors to improve system performance and reliability.</li>
                         <li>Enforced HSTS policies ensuring secure HTTPS communication across 100% of web traffic.</li>
                         <li>Optimized Horizontal Pod Autoscaler (HPA) to handle load spikes during deployments with 0 downtime.</li>
@@ -371,7 +389,7 @@
 
              <div class="job-entry">
                 <div class="job-title-bar" onclick="toggleJob('edu', this)">
-                    <span><span class="indicator">[ + ]</span> B.Tech Computer Science @ State University</span>
+                    <span><span class="indicator">[ + ]</span> Bachelor of Computer Science Engineering @ State University</span>
                     <span class="warning">September 2018 - May 2022</span>
                 </div>
                 <div class="job-details" id="edu">
@@ -390,7 +408,7 @@
         </div>
 
         <div class="output hidden" id="out-download">
-            <span style="color: var(--comment);">100% [======================================>] 124,512  --.-KB/s   in 0.02s</span><br>
+            <span style="color: var(--comment);">100% [======================================>] 124,512  --.-KB/s    in 0.02s</span><br>
             <a href="MadhavamSaxena_Resume.pdf" class="pdf-link" style="display: inline-block; margin-top: 10px;" target="_blank">[ Download Traditional PDF ]</a>
         </div>
         
