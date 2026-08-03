@@ -1,27 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#ffffff" id="theme-meta">
     <title>Madhavam Saxena | DevOps Portfolio Dashboard</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        :root {
-            --bg-main: #fdfcfb;
-            --accent-primary: #1e293b;
-            --accent-secondary: #64748b;
-            --accent-highlight: #3b82f6;
-            --card-bg: #ffffff;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--accent-primary);
             scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .chart-container {
@@ -34,15 +42,14 @@
             max-height: 350px;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
         .nav-link.active {
-            color: var(--accent-highlight);
-            border-bottom: 2px solid var(--accent-highlight);
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+        
+        .dark .nav-link.active {
+            color: #60a5fa;
+            border-bottom: 2px solid #60a5fa;
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -52,189 +59,223 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
     </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-12 bg-[#fdfcfb] dark:bg-darkBg text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
-<!-- Chosen Palette: Elegant Sand & Slate -->
-<!-- Application Structure Plan: 
-    1. Dashboard Overview: A high-level summary of Madhavam's professional impact (years of experience, environment scale, cost savings).
-    2. Interactive Impact Matrix: Uses Chart.js to visualize metrics like latency reduction and resource optimization mentioned in the resume.
-    3. Categorized Skills: Grid-based navigation to explore the extensive tech stack.
-    4. Career Timeline: An interactive tab-based experience displaying roles with the requested bullet counts (5, 4, 3, 3) to ensure depth for recent roles while keeping the view concise.
-    5. Contact/Education Footer: Minimalist summary of academic credentials.
--->
-<!-- Visualization & Content Choices:
-    - Impact Radar: Visualizes core DevOps competencies (Security, Cost, Scale, Automation).
-    - Career Tabs: Logical switching between organizations to prevent vertical clutter.
-    - Metric Cards: Quantitative data highlights (55+ envs, $22k savings) for quick scanning.
-    - Tooling Grid: Semantic categorization of skills for easier consumption.
-    - Confirming NO SVG/Mermaid used.
--->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="text-center md:text-left">
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Madhavam Saxena</h1>
-            <p class="text-sm font-medium text-blue-600">DevOps Engineer</p>
+<div id="theme-splash" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#fdfcfb] dark:bg-darkBg transition-all duration-700 ease-in-out transform scale-100 opacity-100">
+    <div class="text-center space-y-10 px-6 max-w-2xl w-full">
+        <div class="space-y-3">
+            <h1 class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">Madhavam Saxena</h1>
+            <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400">Choose your portfolio experience</p>
         </div>
-        <div class="flex flex-col md:flex-row items-center gap-6">
-            <nav class="flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-medium text-slate-600" id="main-nav">
-                <button onclick="switchSection('overview')" class="nav-link active py-1 transition-all">Overview</button>
-                <button onclick="switchSection('experience')" class="nav-link py-1 transition-all">Experience</button>
-                <button onclick="switchSection('skills')" class="nav-link py-1 transition-all">Skills</button>
-                <button onclick="switchSection('impact')" class="nav-link py-1 transition-all">Impact Dashboard</button>
+        
+        <div class="flex flex-col sm:flex-row gap-6 justify-center max-w-md mx-auto w-full">
+            <!-- Light Theme Button -->
+            <button onclick="selectInitialTheme('light')" class="group flex-1 flex flex-col items-center justify-center gap-4 p-8 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </div>
+                <span class="font-bold text-slate-800 dark:text-white text-lg">Light Mode</span>
+            </button>
+
+            <!-- Dark Theme Button -->
+            <button onclick="selectInitialTheme('dark')" class="group flex-1 flex flex-col items-center justify-center gap-4 p-8 bg-slate-900 dark:bg-slate-900 border-2 border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1">
+                <div class="p-4 bg-blue-500/20 text-blue-400 rounded-full group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </div>
+                <span class="font-bold text-white text-lg">Dark Mode</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<header class="sticky top-0 z-50 bg-white/90 dark:bg-darkBg/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-center md:text-left w-full md:w-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Madhavam Saxena</h1>
+                <p class="text-sm font-medium text-blue-600 dark:text-blue-400">DevOps Engineer</p>
+            </div>
+            <!-- Theme Toggle for Mobile (shows next to name on small screens) -->
+            <button onclick="toggleTheme()" class="md:hidden p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Theme">
+                <svg id="theme-icon-mobile" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+            </button>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full md:w-auto">
+            <nav class="flex flex-wrap justify-center gap-3 sm:gap-6 text-sm font-medium text-slate-600 dark:text-slate-400" id="main-nav">
+                <button onclick="switchSection('overview')" class="nav-link active py-2 px-1 transition-all">Overview</button>
+                <button onclick="switchSection('experience')" class="nav-link py-2 px-1 transition-all">Experience</button>
+                <button onclick="switchSection('skills')" class="nav-link py-2 px-1 transition-all">Skills</button>
+                <button onclick="switchSection('impact')" class="nav-link py-2 px-1 transition-all">Impact</button>
             </nav>
-            <a href="MadhavamSaxena_Resume.pdf" download="MadhavamSaxena_Resume.pdf" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Resume
-            </a>
+            
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-center">
+                <!-- Theme Toggle for Desktop -->
+                <button onclick="toggleTheme()" class="hidden md:flex p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" aria-label="Toggle Theme">
+                    <svg id="theme-icon-desktop" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+                
+                <a href="MadhavamSaxena_Resume.pdf" download="MadhavamSaxena_Resume.pdf" class="flex-1 sm:flex-none justify-center flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Resume
+                </a>
+            </div>
         </div>
     </div>
 </header>
 
-<main class="max-w-6xl mx-auto px-6 pt-10">
+<main class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10">
 
-    <!-- Section: Overview -->
     <section id="section-overview" class="content-section space-y-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 space-y-4">
-                <h2 class="text-3xl font-bold text-slate-800">Professional Profile</h2>
-                <p class="text-slate-600 leading-relaxed text-lg">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-4 order-2 lg:order-1">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">Professional Profile</h2>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-base sm:text-lg">
                     Experienced DevOps Engineer with over 4 years of expertise in architecting high-availability cloud infrastructure and automating enterprise-scale environments. Specializing in AWS ecosystem management, Kubernetes orchestration (EKS), and building robust CI/CD pipelines that prioritize security and cost-efficiency.
                 </p>
-                <div class="flex flex-wrap gap-3 pt-2">
-                    <span class="px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600">AWS ARCHITECTING</span>
-                    <span class="px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600">KUBERNETES EXPERT</span>
-                    <span class="px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600">SRE SPECIALIST</span>
-                    <span class="px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-600">INFRASTRUCTURE AS CODE</span>
+                <div class="flex flex-wrap gap-2 sm:gap-3 pt-2">
+                    <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">AWS ARCHITECTING</span>
+                    <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">KUBERNETES EXPERT</span>
+                    <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">SRE SPECIALIST</span>
+                    <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">INFRASTRUCTURE AS CODE</span>
                 </div>
             </div>
-            <div class="glass-card p-0 rounded-2xl flex flex-col items-center text-center shadow-sm relative overflow-hidden pb-6">
+            
+            <div class="bg-white dark:bg-darkCard p-0 rounded-2xl flex flex-col items-center text-center shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden pb-6 order-1 lg:order-2 transition-colors duration-300">
                 <!-- Decorative background banner for the profile card -->
-                <div class="w-full h-20 bg-gradient-to-r from-blue-100 to-slate-200 z-0"></div>
+                <div class="w-full h-24 bg-gradient-to-r from-blue-100 to-slate-200 dark:from-blue-900/40 dark:to-slate-800 z-0"></div>
                 
                 <!-- Profile Image Container with Fallback -->
-                <div class="relative z-10 w-28 h-28 -mt-14 mb-3">
+                <div class="relative z-10 w-32 h-32 -mt-16 mb-4">
                     <!-- Fallback Avatar (Shows if image fails to load) -->
-                    <div id="avatar-fallback" class="hidden w-full h-full rounded-full border-4 border-white shadow-md bg-gradient-to-br from-blue-600 to-slate-800 items-center justify-center text-white text-3xl font-bold tracking-wider">
+                    <div id="avatar-fallback" class="hidden w-full h-full rounded-full border-4 border-white dark:border-darkCard shadow-md bg-gradient-to-br from-blue-600 to-slate-800 items-center justify-center text-white text-3xl font-bold tracking-wider">
                         MS
                     </div>
                     <!-- Actual Profile Image -->
-                    <img src="LinkedInProfileImage.jpg" id="profile-img" alt="Madhavam Saxena" class="w-full h-full rounded-full object-cover border-4 border-white shadow-md bg-white" 
+                    <img src="image_8212b8.jpg" id="profile-img" alt="Madhavam Saxena" class="w-full h-full rounded-full object-cover border-4 border-white dark:border-darkCard shadow-md bg-white dark:bg-darkCard transition-colors duration-300" 
                          onerror="this.classList.add('hidden'); document.getElementById('avatar-fallback').classList.remove('hidden'); document.getElementById('avatar-fallback').classList.add('flex');">
                 </div>
                 
                 <!-- Stats and Contact -->
-                <div class="relative z-10 text-3xl font-bold text-blue-600 mb-1">4+</div>
-                <div class="relative z-10 text-xs font-bold text-slate-800 uppercase tracking-widest">Years Experience</div>
-                <div class="relative z-10 mt-4 space-y-1.5 text-xs text-slate-500 font-medium px-4">
-                    <p class="flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> +91-6386695044</p>
-                    <p class="flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> madhavamsaxena14@gmail.com</p>
-                    <p class="flex items-center justify-center gap-2 pt-1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Ayodhya, India</p>
+                <div class="relative z-10 text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">4+</div>
+                <div class="relative z-10 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest">Years Experience</div>
+                <div class="relative z-10 mt-5 space-y-2.5 text-sm text-slate-500 dark:text-slate-400 font-medium px-4 w-full">
+                    <div class="flex items-center justify-center gap-3 bg-slate-50 dark:bg-slate-800/50 py-2 px-3 rounded-lg mx-2 border border-slate-100 dark:border-slate-700/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> 
+                        <span>+91-6386695044</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-3 bg-slate-50 dark:bg-slate-800/50 py-2 px-3 rounded-lg mx-2 border border-slate-100 dark:border-slate-700/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> 
+                        <span class="truncate">madhavamsaxena14@gmail.com</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-3 bg-slate-50 dark:bg-slate-800/50 py-2 px-3 rounded-lg mx-2 border border-slate-100 dark:border-slate-700/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
+                        <span>Ayodhya, India</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="p-6 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div class="text-2xl font-bold text-slate-800">55+</div>
-                <p class="text-xs text-slate-500 font-medium uppercase mt-1">Multi-tenant Envs Managed</p>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-5 sm:p-6 bg-white dark:bg-darkCard border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm transition-colors duration-300">
+                <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">55+</div>
+                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Multi-tenant Envs</p>
             </div>
-            <div class="p-6 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div class="text-2xl font-bold text-slate-800">$22K</div>
-                <p class="text-xs text-slate-500 font-medium uppercase mt-1">Annual Log Savings</p>
+            <div class="p-5 sm:p-6 bg-white dark:bg-darkCard border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm transition-colors duration-300">
+                <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">$22K</div>
+                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Annual Log Savings</p>
             </div>
-            <div class="p-6 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div class="text-2xl font-bold text-slate-800">44%</div>
-                <p class="text-xs text-slate-500 font-medium uppercase mt-1">Latency Reduction</p>
+            <div class="p-5 sm:p-6 bg-white dark:bg-darkCard border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm transition-colors duration-300">
+                <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">44%</div>
+                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Latency Reduction</p>
             </div>
-            <div class="p-6 bg-white border border-slate-100 rounded-xl shadow-sm">
-                <div class="text-2xl font-bold text-slate-800">17+</div>
-                <p class="text-xs text-slate-500 font-medium uppercase mt-1">Microservices Onboarded</p>
+            <div class="p-5 sm:p-6 bg-white dark:bg-darkCard border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm transition-colors duration-300">
+                <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">17+</div>
+                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Microservices Added</p>
             </div>
         </div>
     </section>
 
-    <!-- Section: Experience -->
     <section id="section-experience" class="content-section hidden space-y-8">
         <div class="max-w-3xl">
-            <h2 class="text-2xl font-bold text-slate-800">Career Trajectory</h2>
-            <p class="text-slate-600 mt-2">A focused history of scaling production environments and implementing security-first infrastructure across diverse tech landscapes.</p>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Career Trajectory</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">A focused history of scaling production environments and implementing security-first infrastructure across diverse tech landscapes.</p>
         </div>
 
         <div class="flex flex-col md:flex-row gap-6">
-            <div class="md:w-1/3 flex flex-col gap-2" id="exp-tabs">
-                <button onclick="showExp('innovaccer')" id="tab-innovaccer" class="exp-tab p-4 text-left border-l-4 border-blue-600 bg-blue-50/50">
-                    <p class="text-xs font-bold text-blue-600">OCT 2025 - PRESENT</p>
-                    <h3 class="font-bold text-slate-800">Innovaccer</h3>
-                    <p class="text-xs text-slate-500">Site Reliability Engineer-I</p>
+            <div class="md:w-1/3 flex flex-row overflow-x-auto md:flex-col gap-2 pb-2 md:pb-0 custom-scrollbar snap-x" id="exp-tabs">
+                <button onclick="showExp('innovaccer')" id="tab-innovaccer" class="exp-tab min-w-[200px] md:min-w-0 p-4 text-left border-b-4 md:border-b-0 md:border-l-4 border-blue-600 bg-blue-50/50 dark:bg-blue-900/20 snap-start transition-colors">
+                    <p class="text-xs font-bold text-blue-600 dark:text-blue-400">OCT 2025 - PRESENT</p>
+                    <h3 class="font-bold text-slate-800 dark:text-white mt-1">Innovaccer</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Site Reliability Engineer-I</p>
                 </button>
-                <button onclick="showExp('zupee')" id="tab-zupee" class="exp-tab p-4 text-left border-l-4 border-transparent hover:bg-slate-50">
-                    <p class="text-xs font-bold text-slate-400">AUG 2025 - OCT 2025</p>
-                    <h3 class="font-bold text-slate-800">Zupee</h3>
-                    <p class="text-xs text-slate-500">DevOps Engineer</p>
+                <button onclick="showExp('zupee')" id="tab-zupee" class="exp-tab min-w-[200px] md:min-w-0 p-4 text-left border-b-4 md:border-b-0 md:border-l-4 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 snap-start transition-colors">
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500">AUG 2025 - OCT 2025</p>
+                    <h3 class="font-bold text-slate-800 dark:text-white mt-1">Zupee</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">DevOps Engineer</p>
                 </button>
-                <button onclick="showExp('monotype')" id="tab-monotype" class="exp-tab p-4 text-left border-l-4 border-transparent hover:bg-slate-50">
-                    <p class="text-xs font-bold text-slate-400">AUG 2024 - JULY 2025</p>
-                    <h3 class="font-bold text-slate-800">Monotype Solutions</h3>
-                    <p class="text-xs text-slate-500">Site Reliability Engineer-II</p>
+                <button onclick="showExp('monotype')" id="tab-monotype" class="exp-tab min-w-[200px] md:min-w-0 p-4 text-left border-b-4 md:border-b-0 md:border-l-4 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 snap-start transition-colors">
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500">AUG 2024 - JULY 2025</p>
+                    <h3 class="font-bold text-slate-800 dark:text-white mt-1">Monotype Solutions</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Site Reliability Engineer-II</p>
                 </button>
-                <button onclick="showExp('paytm')" id="tab-paytm" class="exp-tab p-4 text-left border-l-4 border-transparent hover:bg-slate-50">
-                    <p class="text-xs font-bold text-slate-400">NOV 2021 - JULY 2024</p>
-                    <h3 class="font-bold text-slate-800">Paytm</h3>
-                    <p class="text-xs text-slate-500">DevOps Engineer</p>
+                <button onclick="showExp('paytm')" id="tab-paytm" class="exp-tab min-w-[200px] md:min-w-0 p-4 text-left border-b-4 md:border-b-0 md:border-l-4 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50 snap-start transition-colors">
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500">NOV 2021 - JULY 2024</p>
+                    <h3 class="font-bold text-slate-800 dark:text-white mt-1">Paytm</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">DevOps Engineer</p>
                 </button>
             </div>
 
-            <div class="md:w-2/3 glass-card p-8 rounded-2xl" id="exp-content">
+            <div class="md:w-2/3 bg-white dark:bg-darkCard p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm transition-colors duration-300" id="exp-content">
                 <!-- Content injected via JS -->
             </div>
         </div>
     </section>
 
-    <!-- Section: Skills -->
     <section id="section-skills" class="content-section hidden space-y-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
             <div class="space-y-6">
-                <h2 class="text-2xl font-bold text-slate-800">Technical Expertise</h2>
-                <p class="text-slate-600">A comprehensive view of specialized tools and languages used to build enterprise-grade infrastructure. Interactivity focuses on domain proficiency.</p>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Technical Expertise</h2>
+                <p class="text-slate-600 dark:text-slate-400">A comprehensive view of specialized tools and languages used to build enterprise-grade infrastructure.</p>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="skills-grid">
-                    <!-- Categories -->
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-blue-600 uppercase tracking-tighter">Infrastructure & Orchestration</h4>
-                        <ul class="text-sm text-slate-600 space-y-1 font-medium">
+                    <div class="space-y-3 bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Infra & Orchestration</h4>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
                             <li>&#9671; Docker & Kubernetes</li>
                             <li>&#9671; Terraform & Ansible</li>
                             <li>&#9671; Helm & ArgoCD</li>
                             <li>&#9671; Cilium CNI</li>
                         </ul>
                     </div>
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-blue-600 uppercase tracking-tighter">Cloud & Platforms</h4>
-                        <ul class="text-sm text-slate-600 space-y-1 font-medium">
+                    <div class="space-y-3 bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Cloud & Platforms</h4>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
                             <li>&#9671; AWS (EKS, Lambda, SQS)</li>
                             <li>&#9671; Azure Cloud</li>
-                            <li>&#9671; Linux (CentOS, Amazon, Ubuntu)</li>
+                            <li>&#9671; Linux (CentOS, Ubuntu)</li>
                             <li>&#9671; Nginx Web Server</li>
                         </ul>
                     </div>
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-blue-600 uppercase tracking-tighter">Observability & Logs</h4>
-                        <ul class="text-sm text-slate-600 space-y-1 font-medium">
+                    <div class="space-y-3 bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Observability & Logs</h4>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
                             <li>&#9671; ELK Stack & OpenSearch</li>
                             <li>&#9671; Prometheus & Grafana</li>
                             <li>&#9671; Opentelemetry</li>
                             <li>&#9671; ElastAlert</li>
                         </ul>
                     </div>
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-blue-600 uppercase tracking-tighter">DevSecOps & Code</h4>
-                        <ul class="text-sm text-slate-600 space-y-1 font-medium">
+                    <div class="space-y-3 bg-white dark:bg-darkCard p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <h4 class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">DevSecOps & Code</h4>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
                             <li>&#9671; Hashicorp Vault</li>
-                            <li>&#9671; Python & Shell Scripting</li>
+                            <li>&#9671; Python & Shell</li>
                             <li>&#9671; Jenkins & GitLab CI</li>
                             <li>&#9671; Git & BitBucket</li>
                         </ul>
@@ -242,49 +283,48 @@
                 </div>
             </div>
             
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                <h3 class="text-sm font-bold text-slate-800 mb-6 uppercase tracking-widest border-b border-slate-100 pb-3">Engineering Focus</h3>
+            <div class="bg-white dark:bg-darkCard p-6 sm:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-center transition-colors duration-300">
+                <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-6 uppercase tracking-widest border-b border-slate-100 dark:border-slate-700 pb-3">Engineering Focus</h3>
                 <div class="space-y-6">
                     <div class="relative pl-4 border-l-2 border-blue-500">
-                        <h4 class="text-sm font-bold text-slate-800">Scalable Infrastructure</h4>
-                        <p class="text-xs text-slate-500 mt-1">Architecting multi-tenant, high-availability environments using AWS and Kubernetes (EKS) for enterprise workloads.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white">Scalable Infrastructure</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Architecting multi-tenant, high-availability environments using AWS and Kubernetes (EKS) for enterprise workloads.</p>
                     </div>
                     <div class="relative pl-4 border-l-2 border-emerald-500">
-                        <h4 class="text-sm font-bold text-slate-800">Automation & GitOps</h4>
-                        <p class="text-xs text-slate-500 mt-1">Streamlining zero-downtime deployments and eliminating manual overhead with ArgoCD, Terraform, and advanced CI/CD pipelines.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white">Automation & GitOps</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Streamlining zero-downtime deployments and eliminating manual overhead with ArgoCD, Terraform, and advanced CI/CD pipelines.</p>
                     </div>
                     <div class="relative pl-4 border-l-2 border-amber-500">
-                        <h4 class="text-sm font-bold text-slate-800">Observability & Reliability</h4>
-                        <p class="text-xs text-slate-500 mt-1">Ensuring proactive system health monitoring and rapid incident response through ELK, Prometheus, and automated alerting.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white">Observability & Reliability</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ensuring proactive system health monitoring and rapid incident response through ELK, Prometheus, and automated alerting.</p>
                     </div>
                     <div class="relative pl-4 border-l-2 border-purple-500">
-                        <h4 class="text-sm font-bold text-slate-800">Cost & Security Optimization</h4>
-                        <p class="text-xs text-slate-500 mt-1">Driving resource optimization via Karpenter and hardening cloud networks with Cilium CNI and zero-trust architectures.</p>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white">Cost & Security Optimization</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Driving resource optimization via Karpenter and hardening cloud networks with Cilium CNI and zero-trust architectures.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section: Impact -->
-    <section id="section-impact" class="content-section hidden space-y-10">
+    <section id="section-impact" class="content-section hidden space-y-8">
         <div class="max-w-2xl">
-            <h2 class="text-2xl font-bold text-slate-800">Strategic Impact Dashboard</h2>
-            <p class="text-slate-600 mt-2">Visualizing quantitative improvements in performance, cost, and reliability across various roles.</p>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Strategic Impact Dashboard</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">Visualizing quantitative improvements in performance, cost, and reliability across various roles.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                <h4 class="font-bold text-slate-800">Efficiency Improvements</h4>
-                <p class="text-xs text-slate-500">Visualizing latency reduction and resource utilization optimization.</p>
-                <div class="chart-container">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div class="p-4 sm:p-6 bg-white dark:bg-darkCard rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4 transition-colors duration-300">
+                <h4 class="font-bold text-slate-800 dark:text-white">Efficiency Improvements</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Visualizing latency reduction and resource utilization optimization.</p>
+                <div class="chart-container relative w-full h-[250px] sm:h-[300px]">
                     <canvas id="impactChart"></canvas>
                 </div>
             </div>
-            <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                <h4 class="font-bold text-slate-800">Environment Scale Growth</h4>
-                <p class="text-xs text-slate-500">Timeline of managed production environments and microservices.</p>
-                <div class="chart-container">
+            <div class="p-4 sm:p-6 bg-white dark:bg-darkCard rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4 transition-colors duration-300">
+                <h4 class="font-bold text-slate-800 dark:text-white">Environment Scale Growth</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Timeline of managed production environments and microservices.</p>
+                <div class="chart-container relative w-full h-[250px] sm:h-[300px]">
                     <canvas id="scaleChart"></canvas>
                 </div>
             </div>
@@ -293,23 +333,106 @@
 
 </main>
 
-<footer class="mt-20 border-t border-slate-100 py-12 bg-slate-50/50">
-    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div class="space-y-4">
-            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Academic Background</h3>
+<footer class="mt-16 sm:mt-20 border-t border-slate-100 dark:border-slate-800 py-10 sm:py-12 bg-slate-50/50 dark:bg-darkBg transition-colors duration-300">
+    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+        <div class="space-y-4 text-center md:text-left">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Academic Background</h3>
             <div>
-                <p class="font-bold text-slate-800">Bachelor of Computer Science Engineering</p>
-                <p class="text-slate-600">State University | 2018 - 2022</p>
-                <p class="text-blue-600 font-bold mt-1 text-sm">Aggregate: 83.4%</p>
+                <p class="font-bold text-slate-800 dark:text-white">Bachelor of Computer Science Engineering</p>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">State University | 2018 - 2022</p>
+                <p class="text-blue-600 dark:text-blue-400 font-bold mt-1 text-sm">Aggregate: 83.4%</p>
             </div>
         </div>
-        <div class="flex md:justify-end items-end">
-            <p class="text-xs text-slate-400 font-medium">© 2024 Madhavam Saxena • DevOps Engineering Excellence</p>
+        <div class="flex md:justify-end items-end justify-center">
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-medium text-center md:text-right">© 2024 Madhavam Saxena <br class="sm:hidden"/>• DevOps Engineering Excellence</p>
         </div>
     </div>
 </footer>
 
 <script>
+    const sunIcon = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+    const moonIcon = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+
+    function updateThemeIcon(isDark) {
+        document.getElementById('theme-icon-desktop').innerHTML = isDark ? sunIcon : moonIcon;
+        document.getElementById('theme-icon-mobile').innerHTML = isDark ? sunIcon : moonIcon;
+        document.getElementById('theme-meta').content = isDark ? "#0f172a" : "#ffffff";
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        const isDark = html.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeIcon(isDark);
+        updateChartTheme(isDark);
+    }
+
+    function selectInitialTheme(themeMode) {
+        const isDark = themeMode === 'dark';
+        
+        // Apply theme classes
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // Save preferences
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('themeSetupComplete', 'true');
+        
+        // Update Icons & Charts
+        updateThemeIcon(isDark);
+        updateChartTheme(isDark);
+        
+        // Animate Splash Screen Away
+        const splash = document.getElementById('theme-splash');
+        splash.classList.add('opacity-0', 'pointer-events-none');
+        splash.classList.replace('scale-100', 'scale-105');
+        
+        setTimeout(() => {
+            splash.style.display = 'none';
+            document.body.classList.remove('overflow-hidden');
+        }, 700); // Matches the CSS transition duration
+    }
+
+    function initTheme() {
+        const setupComplete = localStorage.getItem('themeSetupComplete');
+        const splash = document.getElementById('theme-splash');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (!setupComplete) {
+            // First time visitor: Show splash screen & prevent scrolling
+            document.body.classList.add('overflow-hidden');
+            splash.style.display = 'flex';
+            
+            // Make the splash screen match the user's system preference initially so it doesn't blind them
+            if (prefersDark) {
+                document.documentElement.classList.add('dark');
+            }
+        } else {
+            // Returning visitor: Hide splash immediately
+            splash.style.display = 'none';
+            document.body.classList.remove('overflow-hidden');
+            
+            // Load saved theme
+            const storedTheme = localStorage.getItem('theme');
+            const isDark = storedTheme === 'dark' || (!storedTheme && prefersDark);
+            
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeIcon(isDark);
+        }
+    }
+
+    // Initialize Theme logic immediately to prevent flash
+    initTheme();
+
+    // --- Content Management ---
     const experiences = {
         innovaccer: {
             bullets: [
@@ -359,39 +482,70 @@
         const content = document.getElementById('exp-content');
         const data = experiences[id];
         
+        // Update Tabs Styling
         document.querySelectorAll('.exp-tab').forEach(t => {
-            t.classList.remove('border-blue-600', 'bg-blue-50/50');
+            // Remove active classes
+            t.classList.remove('border-blue-600', 'bg-blue-50/50', 'dark:bg-blue-900/20');
             t.classList.add('border-transparent');
-            t.querySelector('p').classList.replace('text-blue-600', 'text-slate-400');
+            
+            // Revert text colors
+            const dateP = t.querySelector('p:first-child');
+            if(dateP.classList.contains('text-blue-600')) {
+                dateP.classList.replace('text-blue-600', 'text-slate-400');
+                dateP.classList.replace('dark:text-blue-400', 'dark:text-slate-500');
+            }
         });
 
         const activeTab = document.getElementById(`tab-${id}`);
-        activeTab.classList.add('border-blue-600', 'bg-blue-50/50');
+        // Add active classes (Note: responsive borders md:border-l-4 vs border-b-4 are handled in HTML classes)
+        activeTab.classList.add('border-blue-600', 'bg-blue-50/50', 'dark:bg-blue-900/20');
         activeTab.classList.remove('border-transparent');
-        activeTab.querySelector('p').classList.replace('text-slate-400', 'text-blue-600');
+        
+        // Update text colors
+        const activeDateP = activeTab.querySelector('p:first-child');
+        activeDateP.classList.replace('text-slate-400', 'text-blue-600');
+        activeDateP.classList.replace('dark:text-slate-500', 'dark:text-blue-400');
 
         content.innerHTML = `
             <ul class="space-y-4">
                 ${data.bullets.map(b => `
                     <li class="flex gap-4 group">
                         <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0 group-hover:scale-150 transition-transform"></span>
-                        <p class="text-slate-600 leading-relaxed text-sm">${b}</p>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">${b}</p>
                     </li>
                 `).join('')}
             </ul>
         `;
     }
 
+    // --- Chart.js Management ---
     let barChart, scaleChartInstance;
+
+    function updateChartTheme(isDark) {
+        if (!barChart || !scaleChartInstance) return;
+        
+        const textColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 vs slate-500
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+        Chart.defaults.color = textColor;
+        Chart.defaults.scale.grid.color = gridColor;
+        
+        barChart.update();
+        scaleChartInstance.update();
+    }
 
     function initImpactCharts() {
         if (barChart) return;
         
+        const isDark = document.documentElement.classList.contains('dark');
+        Chart.defaults.color = isDark ? '#94a3b8' : '#64748b';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
         const ctx1 = document.getElementById('impactChart').getContext('2d');
         barChart = new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: ['Latency (ms)', 'Disk Space (%)', 'Cloud Cost (%)', 'Security Backlog'],
+                labels: ['Latency (ms)', 'Disk Space (%)', 'Cloud Cost (%)', 'Sec. Backlog'],
                 datasets: [
                     {
                         label: 'Before',
@@ -410,7 +564,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
                 scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' } },
                     x: { grid: { display: false } }
                 }
             }
@@ -435,7 +589,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true },
+                    y: { beginAtZero: true, grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' } },
                     x: { grid: { display: false } }
                 }
             }
