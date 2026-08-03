@@ -115,8 +115,16 @@
                 <!-- Decorative background banner for the profile card -->
                 <div class="w-full h-20 bg-gradient-to-r from-blue-100 to-slate-200 z-0"></div>
                 
-                <!-- Profile Image -->
-                <img src="LinkedInProfileImage.jpg" alt="Madhavam Saxena" class="relative z-10 w-28 h-28 rounded-full object-cover border-4 border-white shadow-md -mt-14 mb-3">
+                <!-- Profile Image Container with Fallback -->
+                <div class="relative z-10 w-28 h-28 -mt-14 mb-3">
+                    <!-- Fallback Avatar (Shows if image fails to load) -->
+                    <div id="avatar-fallback" class="hidden w-full h-full rounded-full border-4 border-white shadow-md bg-gradient-to-br from-blue-600 to-slate-800 items-center justify-center text-white text-3xl font-bold tracking-wider">
+                        MS
+                    </div>
+                    <!-- Actual Profile Image -->
+                    <img src="LinkedInProfileImage.jpg" id="profile-img" alt="Madhavam Saxena" class="w-full h-full rounded-full object-cover border-4 border-white shadow-md bg-white" 
+                         onerror="this.classList.add('hidden'); document.getElementById('avatar-fallback').classList.remove('hidden'); document.getElementById('avatar-fallback').classList.add('flex');">
+                </div>
                 
                 <!-- Stats and Contact -->
                 <div class="relative z-10 text-3xl font-bold text-blue-600 mb-1">4+</div>
