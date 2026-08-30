@@ -62,6 +62,44 @@
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #475569;
         }
+
+        /* Proof-of-deployment gallery */
+        .shot-card img {
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            object-position: top;
+            width: 100%;
+            cursor: zoom-in;
+            transition: transform .3s ease;
+        }
+        .shot-card:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            cursor: zoom-out;
+        }
+        #lightbox.open { display: flex; }
+        #lightbox img {
+            max-width: 95vw;
+            max-height: 82vh;
+            border-radius: 8px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.5);
+            cursor: default;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .shot-card img, .shot-card:hover img { transition: none; transform: none; }
+        }
     </style>
 </head>
 <body class="min-h-screen pb-12 bg-[#fdfcfb] dark:bg-darkBg text-slate-800 dark:text-slate-200 transition-colors duration-300">
@@ -111,6 +149,7 @@
                 <button onclick="switchSection('overview')" class="nav-link active py-2 px-1 transition-all">Overview</button>
                 <button onclick="switchSection('experience')" class="nav-link py-2 px-1 transition-all">Experience</button>
                 <button onclick="switchSection('skills')" class="nav-link py-2 px-1 transition-all">Skills</button>
+                <button onclick="switchSection('projects')" class="nav-link py-2 px-1 transition-all">Projects</button>
                 <button onclick="switchSection('impact')" class="nav-link py-2 px-1 transition-all">Impact</button>
             </nav>
             
@@ -307,6 +346,180 @@
         </div>
     </section>
 
+    <!-- ================= PROJECTS & LABS ================= -->
+    <section id="section-projects" class="content-section hidden space-y-8">
+        <div class="max-w-3xl">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Projects & Labs</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">Hands-on deep dives into production-grade tooling — built as interactive, visual explainers rather than static write-ups.</p>
+        </div>
+
+        <!-- Featured Project: ArgoCD Lab -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors duration-300">
+            <!-- Banner strip -->
+            <div class="h-2 bg-gradient-to-r from-orange-500 via-blue-500 to-emerald-500"></div>
+
+            <div class="p-6 sm:p-8">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Left: description -->
+                    <div class="lg:w-3/5 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-lg">
+                                <!-- ArgoCD-esque octopus/ship icon (generic anchor) -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="21"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-white">ArgoCD Lab — App-of-Apps, Charted</h3>
+                                <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Interactive GitOps explainer · single-file HTML</p>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            An interactive visualization of the ArgoCD <b class="text-slate-800 dark:text-slate-200">app-of-apps pattern</b>: one manually-applied bootstrap Application cascades into an AppProject fence, an ApplicationSet stamping one Application per list entry, and multi-source Helm keeping charts environment-blind via <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">$values</code> overlays.
+                        </p>
+
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-orange-500 shrink-0"></span><span>Animated traces for the full <b>bootstrap cascade</b>, the 3-touch "add an app" workflow, finalizer-backed removal, and <b>selfHeal drift reversion</b>.</span></li>
+                            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0"></span><span>Clickable node graph of every CR in the system — seed, AppProject, ApplicationSet generator/template, generated Applications, and Helm sources.</span></li>
+                            <li class="flex gap-3"><span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"></span><span>Encodes two GitOps rules: nothing runs from the laptop, and <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">automated: {prune, selfHeal}</code> at every level.</span></li>
+                        </ul>
+
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">ARGOCD</span>
+                            <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">GITOPS</span>
+                            <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">HELM MULTI-SOURCE</span>
+                            <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">APPLICATIONSET</span>
+                            <span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700">KUBERNETES</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: quick facts + actions -->
+                    <div class="lg:w-2/5 flex flex-col justify-between gap-6">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 text-center">
+                                <div class="text-xl font-bold text-orange-600 dark:text-orange-400">1</div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Manual Apply</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 text-center">
+                                <div class="text-xl font-bold text-blue-600 dark:text-blue-400">4</div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Animated Traces</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 text-center">
+                                <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400">3</div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Touches per App</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 text-center">
+                                <div class="text-xl font-bold text-purple-600 dark:text-purple-400">13</div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase mt-1">Inspectable Nodes</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row lg:flex-col gap-3">
+                            <a href="https://msaxena14.github.io/ArgoCD/argocd-lab.html" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                Explore Interactive Lab
+                            </a>
+                            <a href="https://github.com/msaxena14/ArgoCD" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-5 py-3 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"></path></svg>
+                                View Source on GitHub
+                            </a>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed text-center lg:text-left">The lab is an interactive walkthrough of the setup; the actual ArgoCD instance runs on a local cluster — see Proof of Deployment below for live captures.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proof of Deployment: collapsible screenshot gallery -->
+            <div class="border-t border-slate-100 dark:border-slate-700" id="proof-gallery">
+                <button onclick="toggleProof()" id="proof-toggle" class="w-full flex items-center justify-between gap-3 p-6 sm:px-8 sm:py-5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors" aria-expanded="false" aria-controls="proof-body">
+                    <div class="flex items-center gap-4 min-w-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-slate-800 dark:text-white">Proof of Deployment</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Live captures from the running lab — ArgoCD UI, cluster state, and the rendered apps.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="hidden sm:inline text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-full">Verified on local cluster</span>
+                        <svg id="proof-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="text-slate-400 dark:text-slate-500 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </button>
+
+                <div id="proof-body" class="hidden px-6 sm:px-8 pb-6 sm:pb-8 space-y-4">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Click any capture to enlarge.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/argocd-applications-overview.png" alt="ArgoCD UI: applications overview showing bootstrap-app, labs-hello-world and labs-podinfo all Synced and Healthy" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">Applications Overview</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">All three Applications — seed + two children — Synced &amp; Healthy in the ArgoCD UI.</p>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/argocd-app-of-apps-tree.png" alt="ArgoCD UI: bootstrap-app resource tree showing the AppProject and ApplicationSet it manages" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">App-of-Apps Tree</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">The seed's resource tree — AppProject "lab" and ApplicationSet "lab-apps" managed from git.</p>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/argocd-podinfo-tree.png" alt="ArgoCD UI: labs-podinfo resource tree with Deployment, Redis subchart, Service and ServiceMonitor" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">Podinfo Resource Tree</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Multi-source render: upstream chart + Redis subchart, all landing in namespace app.</p>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/kubectl-cluster-state.png" alt="Terminal output: kubectl get applications -n argocd and kubectl get pods -n app showing all resources running" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">Cluster State (kubectl)</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Application CRs in argocd namespace and running pods in namespace app.</p>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/podinfo-ui-override.png" alt="Podinfo web UI displaying the custom message set in values/local/podinfo/values.yaml" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">Values Overlay in Action</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Podinfo UI showing the message overridden via $values/values/local/podinfo/values.yaml.</p>
+                        </figcaption>
+                    </figure>
+
+                    <figure class="shot-card bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+                        <div class="overflow-hidden">
+                            <img src="screenshots/argocd-selfheal-event.png" alt="ArgoCD sync history showing an automated selfHeal sync reverting a manual kubectl edit" loading="lazy" onclick="openLightbox(this)" onerror="shotFallback(this)">
+                        </div>
+                        <figcaption class="p-3.5">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white">selfHeal Reverting Drift</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Sync history after a manual kubectl edit — automated selfHeal restored the git state.</p>
+                        </figcaption>
+                    </figure>
+
+                </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Placeholder for future labs -->
+        <div class="p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-center">
+            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium">More labs on the way — Cilium network policies, Karpenter autoscaling deep-dive, and EKS upgrade automation.</p>
+        </div>
+    </section>
+
     <section id="section-impact" class="content-section hidden space-y-8">
         <div class="max-w-2xl">
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Strategic Impact Dashboard</h2>
@@ -333,6 +546,11 @@
 
 </main>
 
+<!-- Screenshot lightbox -->
+<div id="lightbox" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Enlarged screenshot">
+    <img id="lightbox-img" src="" alt="">
+</div>
+
 <footer class="mt-16 sm:mt-20 border-t border-slate-100 dark:border-slate-800 py-10 sm:py-12 bg-slate-50/50 dark:bg-darkBg transition-colors duration-300">
     <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
         <div class="space-y-4 text-center md:text-left">
@@ -352,6 +570,7 @@
 <script>
     const sunIcon = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
     const moonIcon = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+
 
     function updateThemeIcon(isDark) {
         document.getElementById('theme-icon-desktop').innerHTML = isDark ? sunIcon : moonIcon;
@@ -477,6 +696,47 @@
 
         if(sectionId === 'impact') initImpactCharts();
     }
+
+    // --- Proof of Deployment dropdown ---
+    function toggleProof() {
+        const body = document.getElementById('proof-body');
+        const toggle = document.getElementById('proof-toggle');
+        const chevron = document.getElementById('proof-chevron');
+        const isOpen = body.classList.toggle('hidden') === false;
+        toggle.setAttribute('aria-expanded', isOpen);
+        chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // --- Screenshot loading: try local screenshots/ first, then GitHub Pages, then hide ---
+    const SCREENSHOTS_REMOTE = 'https://msaxena14.github.io/ArgoCD/screenshots/';
+    function shotFallback(img) {
+        if (!img.dataset.retried) {
+            img.dataset.retried = '1';
+            const filename = img.src.split('/').pop();
+            img.src = SCREENSHOTS_REMOTE + filename;
+        } else {
+            img.closest('figure').style.display = 'none';
+        }
+    }
+
+    // --- Screenshot lightbox ---
+    function openLightbox(imgEl) {
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+        lbImg.src = imgEl.src;
+        lbImg.alt = imgEl.alt;
+        lb.classList.add('open');
+        document.body.classList.add('overflow-hidden');
+    }
+    function closeLightbox(e) {
+        // Close on backdrop click or on the image itself
+        const lb = document.getElementById('lightbox');
+        lb.classList.remove('open');
+        document.body.classList.remove('overflow-hidden');
+    }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeLightbox();
+    });
 
     function showExp(id) {
         const content = document.getElementById('exp-content');
