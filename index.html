@@ -232,11 +232,11 @@
   details.proof summary small { display: block; color: var(--muted); font-weight: 400; font-size: .9rem; }
   details.proof summary::after { content: "+"; font-size: 1.4rem; color: var(--muted); line-height: 1; }
   details.proof[open] summary::after { content: "–"; }
-  .gallery { padding: 0 28px 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .gallery { padding: 0 28px 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .shot { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); }
   .shot button { all: unset; display: block; width: 100%; cursor: zoom-in; }
   .shot button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-  .shot img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+  .shot img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: contain; background: #0b0f17; }
   .shot figcaption { padding: 12px 14px; font-size: .9rem; }
   .shot figcaption strong { display: block; }
   .shot figcaption span { color: var(--muted); font-size: .85rem; }
@@ -245,7 +245,7 @@
     border: 0; padding: 0; background: transparent; max-width: 95vw; max-height: 92vh; overflow: visible;
   }
   dialog#lightbox::backdrop { background: rgba(8, 14, 26, .88); }
-  dialog#lightbox img { max-width: 95vw; max-height: 84vh; border-radius: 8px; }
+  dialog#lightbox img { max-width: 95vw; max-height: 84vh; width: auto; height: auto; border-radius: 8px; }
   dialog#lightbox .close { position: absolute; top: -44px; right: 0; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font: 600 .9rem var(--body); cursor: pointer; }
 
   /* ---------- Skills ---------- */
@@ -535,27 +535,27 @@
           </summary>
           <div class="gallery" id="gallery">
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/argocd-applications-overview.png" loading="lazy" width="1280" height="800" alt="ArgoCD UI listing bootstrap-app, labs-hello-world and labs-podinfo, all Synced and Healthy"></button>
+              <button type="button" data-full><img src="screenshots/argocd-applications-overview.png" loading="lazy" width="2934" height="1766" alt="ArgoCD UI listing bootstrap-app, labs-hello-world and labs-podinfo, all Synced and Healthy"></button>
               <figcaption><strong>Applications overview</strong><span>Seed plus two children, all Synced and Healthy.</span></figcaption>
             </figure>
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/argocd-app-of-apps-tree.png" loading="lazy" width="1280" height="800" alt="ArgoCD resource tree of bootstrap-app showing the AppProject and ApplicationSet it manages"></button>
+              <button type="button" data-full><img src="screenshots/argocd-app-of-apps-tree.png" loading="lazy" width="2940" height="1760" alt="ArgoCD resource tree of bootstrap-app showing the AppProject and ApplicationSet it manages"></button>
               <figcaption><strong>App-of-apps tree</strong><span>AppProject "lab" and ApplicationSet "lab-apps", managed from git.</span></figcaption>
             </figure>
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/argocd-podinfo-tree.png" loading="lazy" width="1280" height="800" alt="ArgoCD resource tree for labs-podinfo with Deployment, Redis subchart, Service and ServiceMonitor"></button>
+              <button type="button" data-full><img src="screenshots/argocd-podinfo-tree.png" loading="lazy" width="2936" height="1768" alt="ArgoCD resource tree for labs-podinfo with Deployment, Redis subchart, Service and ServiceMonitor"></button>
               <figcaption><strong>Podinfo resource tree</strong><span>Upstream chart plus Redis subchart, all in namespace app.</span></figcaption>
             </figure>
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/kubectl-cluster-state.png" loading="lazy" width="1280" height="800" alt="Terminal output of kubectl get applications and kubectl get pods showing everything running"></button>
+              <button type="button" data-full><img src="screenshots/kubectl-cluster-state.png" loading="lazy" width="2700" height="894" alt="Terminal output of kubectl get applications and kubectl get pods showing everything running"></button>
               <figcaption><strong>Cluster state in kubectl</strong><span>Application CRs in argocd, running pods in app.</span></figcaption>
             </figure>
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/podinfo-ui-override.png" loading="lazy" width="1280" height="800" alt="Podinfo web UI showing the custom message from values/local/podinfo/values.yaml"></button>
+              <button type="button" data-full><img src="screenshots/podinfo-ui-override.png" loading="lazy" width="2922" height="1720" alt="Podinfo web UI showing the custom message from values/local/podinfo/values.yaml"></button>
               <figcaption><strong>Values overlay in action</strong><span>Message overridden through <code>$values</code>.</span></figcaption>
             </figure>
             <figure class="shot">
-              <button type="button" data-full><img src="screenshots/argocd-selfheal-event.png" loading="lazy" width="1280" height="800" alt="ArgoCD sync history showing an automated selfHeal sync reverting a manual kubectl edit"></button>
+              <button type="button" data-full><img src="screenshots/argocd-selfheal-event.png" loading="lazy" width="2928" height="1763" alt="ArgoCD sync history showing an automated selfHeal sync reverting a manual kubectl edit"></button>
               <figcaption><strong>selfHeal reverting drift</strong><span>A manual kubectl edit, undone by automated sync.</span></figcaption>
             </figure>
           </div>
