@@ -1,502 +1,690 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Madhavam Saxena | SRE Terminal</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madhavam Saxena | Site Reliability Engineer: Kubernetes, AWS, GitOps</title>
+<meta name="description" content="Site Reliability Engineer with 4+ years running Kubernetes (EKS) on AWS. Cilium and Karpenter rollouts across 55+ client environments, ArgoCD GitOps, Terraform and observability.">
+<link rel="canonical" href="https://msaxena14.github.io/">
+<meta name="author" content="Madhavam Saxena">
 
-        :root {
-            --bg-color: #090b10;
-            --term-bg: #11151c;
-            --text-main: #a9b7c6;
-            --green: #4ade80;
-            --blue: #60a5fa;
-            --yellow: #fbbf24;
-            --red: #f87171;
-            --comment: #6b7280;
-            --glow: 0 0 4px rgba(74, 222, 128, 0.2);
-        }
+<meta property="og:type" content="website">
+<meta property="og:title" content="Madhavam Saxena | Site Reliability Engineer">
+<meta property="og:description" content="Kubernetes, AWS and GitOps at scale: 55+ client environments, 13+ EKS upgrades, $22K saved in logging cost.">
+<meta property="og:url" content="https://msaxena14.github.io/">
+<meta property="og:image" content="https://msaxena14.github.io/madhavam-saxena.jpeg">
+<meta name="twitter:card" content="summary">
 
-        body {
-            font-family: 'Fira Code', monospace;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.7;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100dvh; /* iOS/Android dynamic viewport fix */
-        }
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f8fb" id="theme-meta">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d4ed8'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' text-anchor='middle' fill='white'%3EMS%3C/text%3E%3C/svg%3E">
 
-        /* Subtle CRT Overlay */
-        body::after {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .terminal-window {
-            width: 100%;
-            max-width: 1000px;
-            background: var(--term-bg);
-            border: 1px solid #1f2937;
-            border-radius: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 2px rgba(255,255,255,0.1);
-            overflow: hidden;
-            position: relative;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            height: 85dvh;
-        }
-
-        .terminal-header {
-            background: #0d1117;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #1f2937;
-        }
-
-        .mac-buttons { display: flex; }
-        .mac-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            opacity: 0.8;
-        }
-        .mac-btn:hover { opacity: 1; }
-        .close { background: #ff5f56; }
-        .min { background: #ffbd2e; }
-        .max { background: #27c93f; }
-
-        .terminal-title {
-            margin: 0 auto;
-            color: var(--comment);
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .pdf-link {
-            color: var(--blue);
-            text-decoration: none;
-            font-size: 0.85rem;
-            border: 1px solid var(--blue);
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .pdf-link:hover {
-            background: var(--blue);
-            color: var(--bg-color);
-        }
-
-        .terminal-body {
-            padding: 24px;
-            flex-grow: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        /* Custom Scrollbar */
-        .terminal-body::-webkit-scrollbar { width: 6px; }
-        .terminal-body::-webkit-scrollbar-track { background: var(--term-bg); }
-        .terminal-body::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
-
-        .prompt { margin-bottom: 8px; }
-        .user { color: var(--green); font-weight: 600; text-shadow: var(--glow); }
-        .host { color: var(--blue); font-weight: 600; }
-        .path { color: var(--yellow); font-weight: 600; }
-        .cmd { color: #f8fafc; }
-
-        .output {
-            margin-bottom: 30px;
-            padding-left: 12px;
-            border-left: 2px solid transparent;
-            transition: border-color 0.3s ease;
-        }
-
-        .output:hover { border-left: 2px solid #374151; }
-
-        .motd {
-            color: var(--comment);
-            margin-bottom: 25px;
-        }
-
-        .highlight { color: var(--blue); }
-        .success { color: var(--green); }
-        .warning { color: var(--yellow); }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .skill-item {
-            background: rgba(255,255,255,0.01);
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #1f2937;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .skill-item:hover {
-            border-color: var(--blue);
-            transform: translateY(-2px);
-            background: rgba(96, 165, 250, 0.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .job-entry {
-            margin-bottom: 16px;
-        }
-
-        .job-title-bar {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(31, 41, 55, 0.4);
-            padding: 12px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            user-select: none;
-            border: 1px solid transparent;
-            flex-wrap: wrap;
-        }
-
-        .job-title-bar:hover {
-            background: rgba(74, 222, 128, 0.1);
-            border-color: rgba(74, 222, 128, 0.2);
-        }
-
-        .indicator {
-            color: var(--comment);
-            margin-right: 8px;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        .job-title-bar:hover .indicator { color: var(--green); }
-
-        /* Smooth Accordion UX */
-        .job-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-            opacity: 0;
-            padding: 0 15px;
-            border-left: 1px dashed #374151;
-            margin-left: 20px;
-        }
-
-        .job-details.active {
-            max-height: 1200px;
-            opacity: 1;
-            padding: 15px;
-            margin-top: 8px;
-        }
-
-        ul { margin: 0; padding-left: 20px; }
-        li { margin-bottom: 10px; color: #d1d5db; }
-
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 18px;
-            background: var(--green);
-            animation: blink 1s step-end infinite;
-            vertical-align: text-bottom;
-            box-shadow: var(--glow);
-        }
-
-        @keyframes blink { 50% { opacity: 0; } }
-        .hidden { display: none; }
-
-        /* --- MOBILE RESPONSIVE TWEAKS --- */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .terminal-window { height: calc(100dvh - 20px); border-radius: 8px; }
-            .terminal-body { padding: 15px; font-size: 0.9rem; }
-            .terminal-header { padding: 10px; }
-            .mac-buttons { display: none; } /* Hide dots on mobile for more space */
-            .terminal-title { margin: 0; text-align: left; flex-grow: 1; }
-            .skills-grid { grid-template-columns: 1fr; }
-            .job-title-bar { flex-direction: column; gap: 5px; }
-            .output { padding-left: 8px; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="terminal-window">
-    <div class="terminal-header">
-        <div class="mac-buttons">
-            <div class="mac-btn close"></div>
-            <div class="mac-btn min"></div>
-            <div class="mac-btn max"></div>
-        </div>
-        <div class="terminal-title">admin@sre-prod-server:~</div>
-        <a href="MadhavamSaxena_Resume.pdf" class="pdf-link" target="_blank">GUI Mode (PDF)</a>
-    </div>
-    
-    <div class="terminal-body" id="term-body">
-        
-        <div class="motd">
-            [ OK ] Booting System...<br>
-            [ OK ] Loading Kernel Modules...<br>
-            [ INFO ] System Ready...
-        </div>
-
-        <!-- WHOAMI -->
-        <div class="prompt">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-whoami"></span><span class="cursor" id="cursor-1"></span>
-        </div>
-        
-        <div class="output hidden" id="out-whoami">
-            <h1 style="margin: 0 0 10px 0; color: var(--green); text-shadow: var(--glow);">Madhavam Saxena</h1>
-            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <span><strong>Role:</strong> <span class="highlight">DEVOPS ENGINEER</span></span>
-                <span><strong>Loc:</strong> Beniganj, Ayodhya (224001)</span>
-                <span><strong>Tel:</strong> +91-6386695044</span>
-                <span><strong>Mail:</strong> madhavamsaxena14@gmail.com</span>
-            </div>
-        </div>
-
-        <!-- CAT SUMMARY -->
-        <div class="prompt hidden" id="prompt-summary">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd" id="type-summary"></span><span class="cursor" id="cursor-2"></span>
-        </div>
-
-        <div class="output hidden" id="out-summary">
-            <p>DevOps Engineer with 4+ years of experience specialising in cloud infrastructure, containerisation, and automation. Proven expertise in AWS, Kubernetes, CI/CD, and infrastructure as code. Demonstrated success in implementing security upgrades, cost optimisation, and maintaining high-availability systems.</p>
-        </div>
-
-        <!-- LS SKILLS -->
-        <div class="prompt hidden" id="prompt-skills">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">ls -la ./skills/</span>
-        </div>
-
-        <div class="output hidden" id="out-skills">
-            <div class="skills-grid">
-                <div class="skill-item"><span class="highlight">Container_Orchestration:</span> Docker, Kubernetes, Cilium CNI</div>
-                <div class="skill-item"><span class="highlight">IaC_ConfigMgmt:</span> Ansible, Terraform</div>
-                <div class="skill-item"><span class="highlight">Programming:</span> Python, Shell Scripting</div>
-                <div class="skill-item"><span class="highlight">Cloud_Services:</span> AWS EC2, S3, Lambda, VPC, IAM, SQS, EKS, CloudWatch, SDK (Boto3), Azure</div>
-                <div class="skill-item"><span class="highlight">Logging_Monitoring:</span> ELK Stack, OpenSearch, Prometheus, Grafana, Opentelemetry</div>
-                <div class="skill-item"><span class="highlight">CI_CD_Secrets:</span> Jenkins, HashiCorp Vault, AWS Secret Manager</div>
-                <div class="skill-item"><span class="highlight">VCS_Tools:</span> GitLab, Git, BitBucket, Helm, GitOps, ArgoCD</div>
-                <div class="skill-item"><span class="highlight">Web_OS:</span> Nginx, CentOS, Amazon Linux, Ubuntu</div>
-                <div class="skill-item"><span class="highlight">OpenSource:</span> ElastAlert</div>
-            </div>
-        </div>
-
-        <!-- SYSTEMCTL EXP -->
-        <div class="prompt hidden" id="prompt-exp">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">systemctl status jobs.service --all</span>
-            <br><span class="comment" style="font-size: 0.85em; margin-top: 5px; display: inline-block; color: var(--comment);"># Click on a service to expand logs</span>
-        </div>
-
-        <div class="output hidden" id="out-exp">
-            
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('innovaccer', this)">
-                    <span><span class="indicator">[ + ]</span> Site Reliability Engineer-I @ Innovaccer</span>
-                    <span class="warning">Oct 2025 - Present</span>
-                </div>
-                <div class="job-details" id="innovaccer">
-                    <ul>
-                        <li>Orchestrated the enterprise-wide rollout of Cilium CNI across 55+ distinct multi-tenant environments, enhancing cluster networking efficiency, implementing namespace-scoped pod isolation, and hardening network security frameworks.</li>
-                        <li>Deployed Karpenter autoscaling engines across 55+ production client environments, reducing node provisioning latency, optimizing compute resource scheduling, and slashing cloud expenditure.</li>
-                        <li>Led a massive EKS 1.33 upgrade campaign across 13+ production clusters, patching runtime deployment blocks and post-upgrade validation tool in Claude Code, utilizing automated pod-status differential snapshots eliminating manual verification.</li>
-                        <li>Authored enterprise platform blueprints and GitOps deep dives for the GitLab stack.</li>
-                        <li>Leveraged advanced Kubernetes Database Operators to automate lifecycle governance setups for business-critical databases.</li>
-                        <li>Led the urgent, successful mitigation of a catastrophic, business-critical AWS MSK Kafka broker failure, performing root-cause analysis to prevent future unstability.</li>
-                        <li>Anchored high-stakes, 24x7 site reliability operations across overlapping evening and night shifts, serving as the primary escalation engineering lead for critical tier-1 production outages.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('zupee', this)">
-                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Zupee</span>
-                    <span class="warning">August 2025 - Oct 2025</span>
-                </div>
-                <div class="job-details" id="zupee">
-                    <ul>
-                        <li>Automated AWS resource management by implementing comprehensive tagging strategy for EC2 instances, EBS volumes, and ENIs, improving resource governance and cost tracking.</li>
-                        <li>Managed multi-environment Kubernetes clusters including k8s-game-stage with resource optimization across 5+ namespaces (cse-astro, cse-tp, cse-carrom, cse-cc, cse-tr).</li>
-                        <li>Successfully onboarded 17+ microservices to Astro / Reels platform including payment, notification, user, & chat services, streamlining deployment processes.</li>
-                        <li>Contributed to DevOps strategy implementation through infrastructure automation and cost optimization initiatives.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('monotype', this)">
-                    <span><span class="indicator">[ + ]</span> Site Reliability Engineer-II @ Monotype Solutions</span>
-                    <span class="warning">August 2024 - July 2025</span>
-                </div>
-                <div class="job-details" id="monotype">
-                    <ul>
-                        <li>Engineered log management using the ELK stack, enhancing the Filebeat configuration for improved log processing and saved up to 5% of disk space.</li>
-                        <li>Diagnosed and resolved high latency from 72ms to 40ms and recurring errors to improve system performance and reliability.</li>
-                        <li>Enforced HSTS policies ensuring secure HTTPS communication across 100% of web traffic.</li>
-                        <li>Optimized Horizontal Pod Autoscaler (HPA) to handle load spikes during deployments with 0 downtime.</li>
-                        <li>Achieved $22K annual savings by optimizing CloudTrail logs and event history.</li>
-                        <li>Introduced and standardized documentation practices while providing technical mentorship to junior team members through comprehensive knowledge transfer sessions on Terraform, Ansible, and Kubernetes, enhancing team capability, reducing onboarding time, and streamlining processes across teams.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="job-entry">
-                <div class="job-title-bar" onclick="toggleJob('paytm', this)">
-                    <span><span class="indicator">[ + ]</span> DevOps Engineer @ Paytm</span>
-                    <span class="warning">November 2021 - July 2024</span>
-                </div>
-                <div class="job-details" id="paytm">
-                    <ul>
-                        <li>Provisioned scalable infrastructure via Terraform: IAM roles, ASGs, ALBs, target groups, and S3 buckets.</li>
-                        <li>Streamlined CI/CD pipelines by developing Jenkins jobs, integrated with S3, Ansible, and Shell scripts, driving automation and deployment efficiency.</li>
-                        <li>Automated pre-billing reports with Python (Boto3), improving accuracy and eliminating manual overhead.</li>
-                        <li>Integrated ElastAlert with ElasticSearch for monitoring 4xx/5xx API errors, strengthening system reliability and observability.</li>
-                        <li>Migrated legacy apps from AMD-based CentOS to ARM-based Amazon EC2 Linux, reducing costs and enhancing performance.</li>
-                        <li>Implemented HashiCorp Vault over auto-scaling groups, enabling HA infrastructure and secure secrets management.</li>
-                        <li>Instrumented CloudWatch alerting on target groups via Terraform, ensuring faster response to system health events.</li>
-                        <li>Managed AWS account migration for 3 business-critical apps with 0 downtime and complete dependency handover.</li>
-                        <li>Executed patching initiative, implemented Packer for automated AMI builds, clearing 1.5-year security backlog with implementation of security best practices and compliance frameworks.</li>
-                        <li>Drove 5% vertical-wide AWS cost reduction by identifying and decommissioning unused AMIs, snapshots, and volumes.</li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- EDUCATION PACKAGE BLOCK -->
-        <div class="prompt hidden" id="prompt-edu">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">apt show degree-btech-cs</span>
-        </div>
-        
-        <div class="output hidden" id="out-edu" style="font-size: 0.95em;">
-            <div><span class="highlight">Package:</span> degree-btech-cs</div>
-            <div><span class="highlight">Status:</span> Completed <span class="success">[VERIFIED]</span></div>
-            <div><span class="highlight">Maintainer:</span> State University (2018 - 2022)</div>
-            <div><span class="highlight">Performance Metric:</span> 83.4%</div>
-            <div><span class="highlight">Description:</span> Core foundational engineering coursework providing fundamental principles of Computer Science, algorithms, and systems architectures.</div>
-        </div>
-
-        <!-- WGET DOWNLOAD PDF -->
-        <div class="prompt hidden" id="prompt-download">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cmd">wget -q --show-progress ./MadhavamSaxena_Resume.pdf</span>
-        </div>
-
-        <div class="output hidden" id="out-download">
-            <span style="color: var(--comment);">100% [======================================>] 124,512  --.-KB/s    in 0.02s</span><br>
-            <a href="MadhavamSaxena_Resume.pdf" class="pdf-link" style="display: inline-block; margin-top: 10px;" target="_blank">[ Download Traditional PDF ]</a>
-        </div>
-        
-        <!-- FINAL PROMPT -->
-        <div class="prompt hidden" id="prompt-final">
-            <span class="user">admin</span>@<span class="host">sre-prod-server</span>:<span class="path">~</span>$ <span class="cursor"></span>
-        </div>
-
-    </div>
-</div>
-
-<script>
-    // Smooth scroll to bottom function
-    function scrollToBottom() {
-        const termBody = document.getElementById('term-body');
-        termBody.scrollTop = termBody.scrollHeight;
-    }
-
-    // UX: Accordion Logic with UI cues
-    function toggleJob(id, element) {
-        const details = document.getElementById(id);
-        const indicator = element.querySelector('.indicator');
-        
-        if (details.classList.contains('active')) {
-            details.classList.remove('active');
-            indicator.innerText = '[ + ]';
-        } else {
-            details.classList.add('active');
-            indicator.innerText = '[ - ]';
-            // Scroll to the opened job slightly to ensure visibility on mobile
-            setTimeout(() => {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 50);
-        }
-    }
-
-    // Typing effect logic
-    function typeWriter(text, elementId, speed, callback) {
-        let i = 0;
-        const elem = document.getElementById(elementId);
-        function type() {
-            if (i < text.length) {
-                elem.innerHTML += text.charAt(i);
-                i++;
-                scrollToBottom();
-                setTimeout(type, speed);
-            } else if (callback) {
-                setTimeout(callback, 200);
-            }
-        }
-        type();
-    }
-
-    // Animation Sequence on Load
-    window.onload = () => {
-        setTimeout(() => {
-            typeWriter('whoami', 'type-whoami', 60, () => {
-                document.getElementById('cursor-1').style.display = 'none';
-                document.getElementById('out-whoami').classList.remove('hidden');
-                document.getElementById('prompt-summary').classList.remove('hidden');
-                scrollToBottom();
-                
-                setTimeout(() => {
-                    typeWriter('cat summary.txt', 'type-summary', 50, () => {
-                        document.getElementById('cursor-2').style.display = 'none';
-                        document.getElementById('out-summary').classList.remove('hidden');
-                        scrollToBottom();
-                        
-                        setTimeout(() => {
-                            // Instant reveal for the rest to respect user's time
-                            document.getElementById('prompt-skills').classList.remove('hidden');
-                            document.getElementById('out-skills').classList.remove('hidden');
-                            document.getElementById('prompt-exp').classList.remove('hidden');
-                            document.getElementById('out-exp').classList.remove('hidden');
-                            document.getElementById('prompt-edu').classList.remove('hidden');
-                            document.getElementById('out-edu').classList.remove('hidden');
-                            document.getElementById('prompt-download').classList.remove('hidden');
-                            document.getElementById('out-download').classList.remove('hidden');
-                            document.getElementById('prompt-final').classList.remove('hidden');
-                            scrollToBottom();
-                        }, 400);
-                    });
-                }, 400);
-            });
-        }, 800);
-    };
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Madhavam Saxena",
+  "jobTitle": "Site Reliability Engineer",
+  "worksFor": { "@type": "Organization", "name": "Innovaccer" },
+  "url": "https://msaxena14.github.io/",
+  "email": "mailto:madhavamsaxena14@gmail.com",
+  "sameAs": ["https://github.com/msaxena14"],
+  "knowsAbout": ["Kubernetes", "AWS", "Terraform", "ArgoCD", "GitOps", "Observability", "Site Reliability Engineering"]
+}
 </script>
 
+<!-- Set theme before first paint so there is no flash -->
+<script>
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --ink: #0f1b2d;
+    --muted: #46556b;
+    --line: #dbe2ec;
+    --accent: #1d4ed8;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6edff;
+    --good: #0f766e;
+    --bar-before: #b8c3d4;
+    --radius: 10px;
+    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  [data-theme="dark"] {
+    --bg: #0b1220;
+    --surface: #121b2e;
+    --ink: #e6ecf5;
+    --muted: #a3b3ca;
+    --line: #25324a;
+    --accent: #7aa2ff;
+    --accent-ink: #0b1220;
+    --accent-soft: #1a2747;
+    --good: #5eead4;
+    --bar-before: #3a4963;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1rem/1.65 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  ul { margin: 0; padding: 0; list-style: none; }
+
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  .skip {
+    position: absolute; left: 12px; top: -60px; z-index: 100;
+    background: var(--accent); color: var(--accent-ink);
+    padding: 10px 16px; border-radius: 8px; font-weight: 600; text-decoration: none;
+  }
+  .skip:focus { top: 12px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 72px 0 8px; }
+  .section-head { max-width: 62ch; margin-bottom: 32px; }
+  .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+  .section-head p { color: var(--muted); margin-top: 10px; }
+
+  /* ---------- Header ---------- */
+  header.site {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; gap: 20px; min-height: 64px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+  .brand { font-family: var(--display); font-weight: 700; font-size: 1.15rem; color: var(--ink); text-decoration: none; margin-right: auto; }
+  nav.primary { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav.primary::-webkit-scrollbar { display: none; }
+  nav.primary a {
+    color: var(--muted); text-decoration: none; font-weight: 500; font-size: .95rem;
+    padding: 8px 12px; border-radius: 8px; white-space: nowrap;
+  }
+  nav.primary a:hover { color: var(--ink); background: var(--accent-soft); }
+  nav.primary a[aria-current="true"] { color: var(--accent); background: var(--accent-soft); }
+  .actions { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 600 .95rem var(--body); text-decoration: none; cursor: pointer;
+    padding: 10px 18px; border-radius: 8px; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn {
+    width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer;
+    background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  [data-theme="light"] .i-sun, [data-theme="dark"] .i-moon { display: none; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding-top: 64px; }
+  .hero-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(2.1rem, 5.2vw, 3.6rem); max-width: 18ch; }
+  .hero .lede { color: var(--muted); font-size: 1.125rem; max-width: 58ch; margin-top: 20px; }
+  .hero .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .chip {
+    font-size: .85rem; font-weight: 500; padding: 5px 12px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line); color: var(--muted);
+  }
+  .card-id {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px; display: grid; gap: 18px; justify-items: start;
+  }
+  .card-id img { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-soft); }
+  .card-id .name { font-family: var(--display); font-weight: 700; font-size: 1.25rem; }
+  .card-id .role { color: var(--muted); font-size: .95rem; }
+  .facts { display: grid; gap: 8px; font-size: .95rem; width: 100%; }
+  .facts li { display: flex; flex-direction: column; gap: 0; }
+  .facts span:first-child { color: var(--muted); font-size: .85rem; }
+  .facts a { overflow-wrap: anywhere; }
+  .hero-grid > *, .project-body > *, .contact > *, .latency > * { min-width: 0; }
+
+  /* ---------- Outcomes ---------- */
+  .outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .outcome {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px;
+  }
+  .outcome .fig { font-family: var(--display); font-weight: 700; font-size: 2.1rem; color: var(--accent); line-height: 1; }
+  .outcome h3 { font-size: 1.05rem; margin-top: 12px; }
+  .outcome p { color: var(--muted); font-size: .95rem; margin-top: 6px; }
+  .outcome .src { font-size: .85rem; color: var(--muted); margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+
+  .latency {
+    margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px; display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; align-items: center;
+  }
+  .latency h3 { font-size: 1.2rem; }
+  .latency p { color: var(--muted); margin-top: 8px; font-size: .95rem; }
+  .bars { display: grid; gap: 14px; }
+  .bar-row { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; font-size: .9rem; }
+  .bar-row .label { color: var(--muted); }
+  .track { background: color-mix(in srgb, var(--line) 55%, transparent); border-radius: 6px; height: 34px; overflow: hidden; }
+  .fill { height: 100%; display: flex; align-items: center; padding-left: 12px; font-weight: 600; border-radius: 6px; transform-origin: left; }
+  .fill.before { width: 100%; background: var(--bar-before); color: var(--ink); }
+  .fill.after { width: 55.6%; background: var(--accent); color: var(--accent-ink); animation: grow 1.1s .15s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes grow { from { transform: scaleX(.2); opacity: .4; } to { transform: scaleX(1); opacity: 1; } }
+
+  /* ---------- Experience (a real sequence, so a rail is meaningful) ---------- */
+  .timeline { position: relative; display: grid; gap: 28px; padding-left: 28px; }
+  .timeline::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .job { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .job::before {
+    content: ""; position: absolute; left: -29px; top: 30px; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--bg); border: 3px solid var(--accent);
+  }
+  .job:not(.current)::before { border-color: var(--bar-before); }
+  .job-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; margin-bottom: 14px; }
+  .job h3 { font-size: 1.25rem; }
+  .job .role { color: var(--muted); font-weight: 500; }
+  .job .dates { color: var(--muted); font-size: .95rem; }
+  .job > ul:not(.tags) { display: grid; gap: 10px; }
+  .job > ul:not(.tags) li { position: relative; padding-left: 18px; max-width: 78ch; }
+  .job > ul:not(.tags) li::before { content: ""; position: absolute; left: 0; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .tag { font-size: .8rem; padding: 3px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); }
+
+  /* ---------- Projects ---------- */
+  .project { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .project-body { padding: 28px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; }
+  .project h3 { font-size: 1.4rem; }
+  .project .kicker { color: var(--muted); font-size: .95rem; margin-top: 4px; }
+  .project p.desc { margin-top: 14px; max-width: 64ch; }
+  .project ul.points { margin-top: 14px; display: grid; gap: 8px; }
+  .project ul.points li { position: relative; padding-left: 18px; }
+  .project ul.points li::before { content: ""; position: absolute; left: 0; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+  code { font: 500 .85em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--accent-soft); padding: 2px 6px; border-radius: 4px; }
+  .project aside { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+  .project aside .note { font-size: .85rem; color: var(--muted); }
+
+  details.proof { border-top: 1px solid var(--line); }
+  details.proof summary {
+    cursor: pointer; list-style: none; padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 600;
+  }
+  details.proof summary::-webkit-details-marker { display: none; }
+  details.proof summary small { display: block; color: var(--muted); font-weight: 400; font-size: .9rem; }
+  details.proof summary::after { content: "+"; font-size: 1.4rem; color: var(--muted); line-height: 1; }
+  details.proof[open] summary::after { content: "–"; }
+  .gallery { padding: 0 28px 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .shot { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); }
+  .shot button { all: unset; display: block; width: 100%; cursor: zoom-in; }
+  .shot button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .shot img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+  .shot figcaption { padding: 12px 14px; font-size: .9rem; }
+  .shot figcaption strong { display: block; }
+  .shot figcaption span { color: var(--muted); font-size: .85rem; }
+
+  dialog#lightbox {
+    border: 0; padding: 0; background: transparent; max-width: 95vw; max-height: 92vh; overflow: visible;
+  }
+  dialog#lightbox::backdrop { background: rgba(8, 14, 26, .88); }
+  dialog#lightbox img { max-width: 95vw; max-height: 84vh; border-radius: 8px; }
+  dialog#lightbox .close { position: absolute; top: -44px; right: 0; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font: 600 .9rem var(--body); cursor: pointer; }
+
+  /* ---------- Skills ---------- */
+  .skills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .skill-group { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .skill-group h3 { font-size: 1.05rem; margin-bottom: 12px; }
+  .skill-group li { padding: 4px 0; color: var(--muted); }
+  .skill-group li strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Contact ---------- */
+  .contact { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; }
+  .contact h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+  .contact p { color: var(--muted); margin-top: 10px; max-width: 52ch; }
+  .contact .links { display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: flex-start; }
+  .edu { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .edu h3 { font-size: 1rem; color: var(--muted); font-family: var(--body); font-weight: 600; }
+  .edu p { margin-top: 6px; color: var(--ink); }
+
+  footer.site { margin-top: 64px; border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: .9rem; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .skills { grid-template-columns: repeat(2, 1fr); }
+    .outcomes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 760px) {
+    section { padding-top: 56px; }
+    .hero-grid, .project-body, .contact, .latency { grid-template-columns: 1fr; }
+    .hero-grid { gap: 32px; }
+    .gallery { grid-template-columns: 1fr; }
+    .bar { gap: 4px 10px; min-height: 0; }
+    nav.primary { order: 3; width: 100%; }
+    .brand { font-size: .98rem; flex: 1 1 auto; min-width: 0; white-space: nowrap; }
+    .actions { gap: 8px; flex: 0 0 auto; }
+    .actions .btn { padding: 9px 14px; }
+    .btn-resume-text { display: none; }
+    .project-body { padding: 22px; }
+    .contact { padding: 24px; }
+  }
+  @media (max-width: 520px) {
+    .skills, .outcomes { grid-template-columns: 1fr; }
+    .wrap { padding: 0 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .fill.after { animation: none; }
+  }
+  @media print {
+    header.site, .actions, details.proof { display: none; }
+    body { background: #fff; color: #000; }
+  }
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="#top">Madhavam Saxena</a>
+    <nav class="primary" aria-label="Primary">
+      <a href="#outcomes">Outcomes</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark theme">
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="btn btn-primary" href="MadhavamSaxena_Resume.pdf" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <span><span class="btn-resume-text">Download </span>Resume</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>Site reliability engineer for Kubernetes fleets on AWS.</h1>
+        <p class="lede">
+          Since 2021 I've kept production boring: GitOps rollouts, zero-downtime cluster upgrades,
+          and cost-aware autoscaling. Right now that means 55+ multi-tenant client environments at Innovaccer.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#contact">Get in touch</a>
+          <a class="btn btn-ghost" href="#projects">See the ArgoCD lab</a>
+        </div>
+        <ul class="chips" aria-label="Focus areas">
+          <li class="chip">Kubernetes / EKS</li>
+          <li class="chip">AWS</li>
+          <li class="chip">GitOps with ArgoCD</li>
+          <li class="chip">Terraform</li>
+          <li class="chip">Observability</li>
+        </ul>
+      </div>
+
+      <div class="card-id">
+        <img src="madhavam-saxena.jpeg" width="112" height="112" alt="Portrait of Madhavam Saxena" fetchpriority="high">
+        <div>
+          <p class="name">Madhavam Saxena</p>
+          <p class="role">Site Reliability Engineer-I at Innovaccer</p>
+        </div>
+        <ul class="facts">
+          <li><span>Location</span><span>Ayodhya, India</span></li>
+          <li><span>Email</span><a href="mailto:madhavamsaxena14@gmail.com">madhavamsaxena14@gmail.com</a></li>
+          <li><span>GitHub</span><a href="https://github.com/msaxena14" target="_blank" rel="noopener">github.com/msaxena14</a></li>
+          <!-- TODO: add your LinkedIn here, e.g.
+          <li><span>LinkedIn</span><a href="https://www.linkedin.com/in/YOUR-HANDLE/" target="_blank" rel="noopener">linkedin.com/in/YOUR-HANDLE</a></li> -->
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OUTCOMES ================= -->
+  <section id="outcomes">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Selected outcomes</h2>
+        <p>The numbers behind the work, each tied to the role where it happened.</p>
+      </div>
+
+      <div class="outcomes">
+        <article class="outcome">
+          <p class="fig">55+</p>
+          <h3>Production environments hardened</h3>
+          <p>Rolled out Cilium CNI and Karpenter across multi-tenant client clusters for tighter networking security and leaner compute.</p>
+          <p class="src">Innovaccer</p>
+        </article>
+        <article class="outcome">
+          <p class="fig">13+</p>
+          <h3>EKS clusters upgraded to 1.33</h3>
+          <p>Automated pod-status snapshots before and after each upgrade, replacing manual verification.</p>
+          <p class="src">Innovaccer</p>
+        </article>
+        <article class="outcome">
+          <p class="fig">$22K</p>
+          <h3>Saved on logging every year</h3>
+          <p>Reworked ELK log management and trimmed CloudTrail event history.</p>
+          <p class="src">Monotype Solutions</p>
+        </article>
+        <article class="outcome">
+          <p class="fig">1.5 yrs</p>
+          <h3>Security backlog cleared</h3>
+          <p>Automated AMI builds with Packer and moved secrets into HashiCorp Vault.</p>
+          <p class="src">Paytm</p>
+        </article>
+        <article class="outcome">
+          <p class="fig">5%</p>
+          <h3>Lower infrastructure cost</h3>
+          <p>Migrated legacy apps to ARM-based EC2 instances with zero downtime.</p>
+          <p class="src">Paytm</p>
+        </article>
+        <article class="outcome">
+          <p class="fig">0</p>
+          <h3>Downtime on an MSK upgrade</h3>
+          <p>Upgraded an AWS MSK cluster in place, and resolved a major broker outage while on call.</p>
+          <p class="src">Innovaccer</p>
+        </article>
+      </div>
+
+      <div class="latency">
+        <div>
+          <h3>Latency cut by 44%</h3>
+          <p>Tuning the Horizontal Pod Autoscaler at Monotype took request latency from 72 ms to 40 ms, with zero-downtime deployments.</p>
+        </div>
+        <div class="bars" role="img" aria-label="Latency before: 72 milliseconds. After: 40 milliseconds.">
+          <div class="bar-row"><span class="label">Before</span><div class="track"><div class="fill before">72 ms</div></div></div>
+          <div class="bar-row"><span class="label">After</span><div class="track"><div class="fill after">40 ms</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXPERIENCE ================= -->
+  <section id="experience">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Experience</h2>
+        <p>Three roles, newest first.</p>
+      </div>
+
+      <div class="timeline">
+        <article class="job current">
+          <div class="job-top">
+            <div>
+              <h3>Innovaccer</h3>
+              <p class="role">Site Reliability Engineer-I</p>
+            </div>
+            <p class="dates">Oct 2025 – Present</p>
+          </div>
+          <ul>
+            <li>Rolled out Cilium CNI across 55+ multi-tenant environments, improving cluster networking efficiency and tightening network security.</li>
+            <li>Deployed Karpenter on 55+ production client environments to schedule compute more efficiently and reduce cloud spend.</li>
+            <li>Led the EKS 1.33 upgrade across 13+ production clusters, using automated pod-status snapshots to replace manual verification.</li>
+            <li>Built a GitOps pipeline on ArgoCD's app-of-apps pattern that handles deployment, cluster bootstrapping and declarative configuration end to end.</li>
+            <li>Resolved a major AWS MSK broker outage and ran a zero-downtime MSK version upgrade as part of 24/7 SRE on-call.</li>
+            <li>Used Kubernetes database operators and wrote platform blueprints for the GitLab stack to automate lifecycle setup and governance.</li>
+          </ul>
+          <ul class="tags" aria-label="Technologies">
+            <li class="tag">EKS</li><li class="tag">Cilium</li><li class="tag">Karpenter</li><li class="tag">ArgoCD</li><li class="tag">AWS MSK</li><li class="tag">GitLab</li>
+          </ul>
+        </article>
+
+        <article class="job">
+          <div class="job-top">
+            <div>
+              <h3>Monotype Solutions</h3>
+              <p class="role">Site Reliability Engineer-II</p>
+            </div>
+            <p class="dates">Aug 2024 – Oct 2025</p>
+          </div>
+          <ul>
+            <li>Saved $22K a year by re-engineering ELK log management and optimizing CloudTrail event history, which also freed 5% of disk space.</li>
+            <li>Tuned the Horizontal Pod Autoscaler for zero-downtime deployments and cut latency from 72 ms to 40 ms.</li>
+            <li>Added CloudWatch alerting through Terraform so incidents surfaced and got resolved faster.</li>
+            <li>Mentored junior engineers on Terraform, Ansible and Kubernetes, and standardized team documentation to speed up onboarding.</li>
+          </ul>
+          <ul class="tags" aria-label="Technologies">
+            <li class="tag">ELK</li><li class="tag">HPA</li><li class="tag">Terraform</li><li class="tag">CloudWatch</li><li class="tag">Ansible</li>
+          </ul>
+        </article>
+
+        <article class="job">
+          <div class="job-top">
+            <div>
+              <h3>Paytm</h3>
+              <p class="role">DevOps Engineer</p>
+            </div>
+            <p class="dates">Nov 2021 – Jul 2024</p>
+          </div>
+          <ul>
+            <li>Provisioned AWS infrastructure with Terraform and migrated legacy apps to ARM-based EC2 with zero downtime, cutting cost by 5% across the vertical.</li>
+            <li>Cleared a 1.5-year security backlog by automating AMI builds with Packer and managing secrets in HashiCorp Vault.</li>
+            <li>Streamlined CI/CD pipelines with Jenkins and Ansible.</li>
+            <li>Added API monitoring with ElastAlert on Elasticsearch, and automated pre-billing reports in Python (Boto3) to remove manual work.</li>
+          </ul>
+          <ul class="tags" aria-label="Technologies">
+            <li class="tag">Terraform</li><li class="tag">Packer</li><li class="tag">Vault</li><li class="tag">Jenkins</li><li class="tag">Python / Boto3</li><li class="tag">ElastAlert</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROJECTS ================= -->
+  <section id="projects">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Projects</h2>
+        <p>Hands-on labs built as interactive explainers, backed by a real cluster.</p>
+      </div>
+
+      <article class="project">
+        <div class="project-body">
+          <div>
+            <h3>ArgoCD lab: app-of-apps, charted</h3>
+            <p class="kicker">Interactive GitOps explainer, single-file HTML</p>
+            <p class="desc">
+              One manually applied bootstrap Application cascades into an AppProject, an ApplicationSet that creates one Application per list entry,
+              and multi-source Helm where charts stay environment-blind through <code>$values</code> overlays.
+            </p>
+            <ul class="points">
+              <li>Animated traces for the bootstrap cascade, the three-touch "add an app" flow, finalizer-backed removal, and <code>selfHeal</code> drift reversion.</li>
+              <li>A clickable graph of all 13 resources in the system, from seed to generated Applications and Helm sources.</li>
+              <li>Two GitOps rules baked in: nothing runs from the laptop, and <code>automated: {prune, selfHeal}</code> at every level.</li>
+            </ul>
+            <ul class="tags" aria-label="Technologies">
+              <li class="tag">ArgoCD</li><li class="tag">GitOps</li><li class="tag">Helm</li><li class="tag">ApplicationSet</li><li class="tag">Kubernetes</li>
+            </ul>
+          </div>
+          <aside>
+            <a class="btn btn-primary" href="https://msaxena14.github.io/ArgoCD/argocd-lab.html" target="_blank" rel="noopener">Open interactive lab</a>
+            <a class="btn btn-ghost" href="https://github.com/msaxena14/ArgoCD" target="_blank" rel="noopener">View source on GitHub</a>
+            <p class="note">The lab explains the setup. The real ArgoCD instance runs on a local cluster, and the captures below come from it.</p>
+          </aside>
+        </div>
+
+        <details class="proof">
+          <summary>
+            <span>Proof of deployment<small>Six captures from the running cluster. Select one to enlarge.</small></span>
+          </summary>
+          <div class="gallery" id="gallery">
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/argocd-applications-overview.png" loading="lazy" width="1280" height="800" alt="ArgoCD UI listing bootstrap-app, labs-hello-world and labs-podinfo, all Synced and Healthy"></button>
+              <figcaption><strong>Applications overview</strong><span>Seed plus two children, all Synced and Healthy.</span></figcaption>
+            </figure>
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/argocd-app-of-apps-tree.png" loading="lazy" width="1280" height="800" alt="ArgoCD resource tree of bootstrap-app showing the AppProject and ApplicationSet it manages"></button>
+              <figcaption><strong>App-of-apps tree</strong><span>AppProject "lab" and ApplicationSet "lab-apps", managed from git.</span></figcaption>
+            </figure>
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/argocd-podinfo-tree.png" loading="lazy" width="1280" height="800" alt="ArgoCD resource tree for labs-podinfo with Deployment, Redis subchart, Service and ServiceMonitor"></button>
+              <figcaption><strong>Podinfo resource tree</strong><span>Upstream chart plus Redis subchart, all in namespace app.</span></figcaption>
+            </figure>
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/kubectl-cluster-state.png" loading="lazy" width="1280" height="800" alt="Terminal output of kubectl get applications and kubectl get pods showing everything running"></button>
+              <figcaption><strong>Cluster state in kubectl</strong><span>Application CRs in argocd, running pods in app.</span></figcaption>
+            </figure>
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/podinfo-ui-override.png" loading="lazy" width="1280" height="800" alt="Podinfo web UI showing the custom message from values/local/podinfo/values.yaml"></button>
+              <figcaption><strong>Values overlay in action</strong><span>Message overridden through <code>$values</code>.</span></figcaption>
+            </figure>
+            <figure class="shot">
+              <button type="button" data-full><img src="screenshots/argocd-selfheal-event.png" loading="lazy" width="1280" height="800" alt="ArgoCD sync history showing an automated selfHeal sync reverting a manual kubectl edit"></button>
+              <figcaption><strong>selfHeal reverting drift</strong><span>A manual kubectl edit, undone by automated sync.</span></figcaption>
+            </figure>
+          </div>
+        </details>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= SKILLS ================= -->
+  <section id="skills">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Skills</h2>
+        <p>Tools I use in production, grouped by the job they do.</p>
+      </div>
+      <div class="skills">
+        <div class="skill-group">
+          <h3>Infrastructure and orchestration</h3>
+          <ul><li><strong>Docker</strong> and <strong>Kubernetes</strong></li><li>Terraform, Ansible, Packer</li><li>Helm, ArgoCD</li><li>Cilium CNI, Karpenter</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Cloud and platforms</h3>
+          <ul><li><strong>AWS</strong>: EKS, MSK, Lambda, SQS</li><li>Azure</li><li>Linux: CentOS, Ubuntu</li><li>Nginx</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Observability</h3>
+          <ul><li>ELK Stack, OpenSearch</li><li>Prometheus, Grafana</li><li>OpenTelemetry</li><li>ElastAlert, CloudWatch</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Delivery and security</h3>
+          <ul><li>HashiCorp Vault</li><li>Python, Shell</li><li>Jenkins, GitLab CI</li><li>Git, Bitbucket</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact">
+        <div>
+          <h2>Let's talk about your infrastructure.</h2>
+          <p>I'm open to SRE and platform engineering conversations. Email is the quickest way to reach me, and my resume has the full detail.</p>
+          <div class="edu">
+            <h3>Education</h3>
+            <p>Bachelor of Computer Science Engineering, State University, 2018–2022 (83.4% aggregate)</p>
+          </div>
+        </div>
+        <div class="links">
+          <a class="btn btn-primary" href="mailto:madhavamsaxena14@gmail.com">Email me</a>
+          <a class="btn btn-ghost" href="MadhavamSaxena_Resume.pdf" download>Download resume (PDF)</a>
+          <a class="btn btn-ghost" href="https://github.com/msaxena14" target="_blank" rel="noopener">GitHub profile</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">© <span id="year">2026</span> Madhavam Saxena</div>
+</footer>
+
+<dialog id="lightbox" aria-label="Enlarged screenshot">
+  <button class="close" type="button" id="lightbox-close">Close</button>
+  <img id="lightbox-img" src="" alt="">
+</dialog>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Theme toggle (also keeps the browser UI colour in sync)
+    var meta = document.getElementById('theme-meta');
+    function syncMeta() { meta.setAttribute('content', root.getAttribute('data-theme') === 'dark' ? '#0b1220' : '#f6f8fb'); }
+    syncMeta();
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      syncMeta();
+    });
+
+    // Scroll-spy: mark the nav link for the section in view
+    var links = Array.prototype.slice.call(document.querySelectorAll('nav.primary a'));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && map[e.target.id]) {
+            links.forEach(function (a) { a.removeAttribute('aria-current'); });
+            map[e.target.id].setAttribute('aria-current', 'true');
+          }
+        });
+      }, { rootMargin: '-35% 0px -60% 0px' });
+      Object.keys(map).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
+    }
+
+    // Screenshots: try local /screenshots first, then the ArgoCD repo's Pages site, then hide the card
+    var REMOTE = 'https://msaxena14.github.io/ArgoCD/screenshots/';
+    document.querySelectorAll('.shot img').forEach(function (img) {
+      img.addEventListener('error', function () {
+        if (!img.dataset.retried) {
+          img.dataset.retried = '1';
+          img.src = REMOTE + img.src.split('/').pop();
+        } else {
+          img.closest('figure').hidden = true;
+        }
+      });
+    });
+
+    // Lightbox on the native <dialog>: Esc, focus trap and focus return come for free
+    var dlg = document.getElementById('lightbox');
+    var dlgImg = document.getElementById('lightbox-img');
+    document.querySelectorAll('[data-full]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var img = btn.querySelector('img');
+        dlgImg.src = img.currentSrc || img.src;
+        dlgImg.alt = img.alt;
+        dlg.showModal();
+      });
+    });
+    document.getElementById('lightbox-close').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target === dlgImg) dlg.close(); });
+  })();
+</script>
 </body>
 </html>
-
