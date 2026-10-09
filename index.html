@@ -45,7 +45,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap">
 
 <style>
   :root {
@@ -60,7 +60,7 @@
     --good: #0f766e;
     --bar-before: #b8c3d4;
     --radius: 10px;
-    --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+    --display: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
     --body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
   }
   [data-theme="dark"] {
@@ -87,7 +87,7 @@
   }
   img { max-width: 100%; display: block; }
   a { color: var(--accent); text-underline-offset: 3px; }
-  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.2; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
   p { margin: 0; }
   ul { margin: 0; padding: 0; list-style: none; }
 
@@ -100,7 +100,7 @@
   }
   .skip:focus { top: 12px; }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   section { padding: 72px 0 8px; }
   .section-head { max-width: 62ch; margin-bottom: 32px; }
   .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
@@ -145,7 +145,7 @@
   /* ---------- Hero ---------- */
   .hero { padding-top: 64px; }
   .hero-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 48px; align-items: center; }
-  .hero h1 { font-size: clamp(2.1rem, 5.2vw, 3.6rem); max-width: 18ch; }
+  .hero h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; max-width: 21ch; }
   .hero .lede { color: var(--muted); font-size: 1.125rem; max-width: 58ch; margin-top: 20px; }
   .hero .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
@@ -155,16 +155,22 @@
   }
   .card-id {
     background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 24px; display: grid; gap: 18px; justify-items: start;
+    padding: 24px; display: grid; gap: 20px;
   }
-  .card-id img { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-soft); }
-  .card-id .name { font-family: var(--display); font-weight: 700; font-size: 1.25rem; }
-  .card-id .role { color: var(--muted); font-size: .95rem; }
-  .facts { display: grid; gap: 8px; font-size: .95rem; width: 100%; }
-  .facts li { display: flex; flex-direction: column; gap: 0; }
-  .facts span:first-child { color: var(--muted); font-size: .85rem; }
-  .facts a { overflow-wrap: anywhere; }
-  .hero-grid > *, .project-body > *, .contact > *, .latency > * { min-width: 0; }
+  .id-top { display: flex; align-items: center; gap: 16px; }
+  .card-id img { width: 84px; height: 84px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-soft); }
+  .card-id .name { font-family: var(--display); font-weight: 700; font-size: 1.2rem; line-height: 1.25; }
+  .card-id .role { color: var(--muted); font-size: .95rem; line-height: 1.4; margin-top: 2px; }
+  .card-id .loc { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: .9rem; margin-top: 8px; }
+  .card-id .loc svg { width: 15px; height: 15px; flex: none; }
+  .id-links { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+    color: var(--ink); font-weight: 600; font-size: .9rem; text-decoration: none;
+  }
+  .pill svg { width: 16px; height: 16px; flex: none; }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ---------- Outcomes ---------- */
   .outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -226,12 +232,29 @@
 
   details.proof { border-top: 1px solid var(--line); }
   details.proof summary {
-    cursor: pointer; list-style: none; padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 600;
+    cursor: pointer; list-style: none; padding: 18px 28px;
+    display: flex; align-items: center; gap: 20px;
   }
   details.proof summary::-webkit-details-marker { display: none; }
-  details.proof summary small { display: block; color: var(--muted); font-weight: 400; font-size: .9rem; }
-  details.proof summary::after { content: "+"; font-size: 1.4rem; color: var(--muted); line-height: 1; }
-  details.proof[open] summary::after { content: "–"; }
+  details.proof summary:hover { background: var(--accent-soft); }
+  .proof-text { margin-right: auto; min-width: 0; }
+  .proof-text strong { display: block; font-size: 1.05rem; }
+  .proof-text small { display: block; color: var(--muted); font-size: .9rem; }
+  .peek { display: flex; padding-left: 14px; }
+  .peek img {
+    width: 76px; height: 48px; object-fit: cover; object-position: top left;
+    border-radius: 6px; border: 2px solid var(--surface); margin-left: -14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  }
+  .proof-btn {
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: .95rem;
+    padding: 10px 16px; border-radius: 8px;
+  }
+  .proof-btn svg { width: 16px; height: 16px; transition: transform .25s ease; }
+  details.proof[open] .proof-btn svg { transform: rotate(180deg); }
+  details.proof[open] .peek, details.proof[open] .when-closed { display: none; }
+  details.proof:not([open]) .when-open { display: none; }
   .gallery { padding: 0 28px 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .shot { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); }
   .shot button { all: unset; display: block; width: 100%; cursor: zoom-in; }
@@ -276,6 +299,9 @@
     .hero-grid, .project-body, .contact, .latency { grid-template-columns: 1fr; }
     .hero-grid { gap: 32px; }
     .gallery { grid-template-columns: 1fr; }
+    details.proof summary { flex-wrap: wrap; padding: 18px 22px; }
+    .peek { display: none; }
+    .proof-btn { width: 100%; justify-content: center; }
     .bar { gap: 4px 10px; min-height: 0; }
     nav.primary { order: 3; width: 100%; }
     .brand { font-size: .98rem; flex: 1 1 auto; min-width: 0; white-space: nowrap; }
@@ -350,16 +376,24 @@
       </div>
 
       <div class="card-id">
-        <img src="madhavam-saxena.jpeg" width="112" height="112" alt="Portrait of Madhavam Saxena" fetchpriority="high">
-        <div>
-          <p class="name">Madhavam Saxena</p>
-          <p class="role">Site Reliability Engineer-I at Innovaccer</p>
+        <div class="id-top">
+          <img src="madhavam-saxena.jpeg" width="84" height="84" alt="Portrait of Madhavam Saxena" fetchpriority="high">
+          <div>
+            <p class="name">Madhavam Saxena</p>
+            <p class="role">Site Reliability Engineer-I<br>Innovaccer</p>
+            <p class="loc">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Ayodhya, India
+            </p>
+          </div>
         </div>
-        <ul class="facts">
-          <li><span>Location</span><span>Ayodhya, India</span></li>
-          <li><span>Email</span><a href="mailto:madhavamsaxena14@gmail.com">madhavamsaxena14@gmail.com</a></li>
-          <li><span>GitHub</span><a href="https://github.com/msaxena14" target="_blank" rel="noopener">github.com/msaxena14</a></li>
-          <li><span>LinkedIn</span><a href="https://www.linkedin.com/in/madhavamsaxena/" target="_blank" rel="noopener">linkedin.com/in/madhavamsaxena</a></li>
+        <ul class="id-links" aria-label="Contact links">
+          <li><a class="pill" href="mailto:madhavamsaxena14@gmail.com" title="madhavamsaxena14@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>Email</a></li>
+          <li><a class="pill" href="https://www.linkedin.com/in/madhavamsaxena/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a></li>
+          <li><a class="pill" href="https://github.com/msaxena14" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>GitHub</a></li>
         </ul>
       </div>
     </div>
@@ -531,7 +565,16 @@
 
         <details class="proof">
           <summary>
-            <span>Proof of deployment<small>Six captures from the running cluster. Select one to enlarge.</small></span>
+            <span class="proof-text"><strong>Proof of deployment</strong><small>Six captures from the running cluster</small></span>
+            <span class="peek" aria-hidden="true">
+              <img src="screenshots/argocd-applications-overview.png" alt="" loading="lazy" width="76" height="48">
+              <img src="screenshots/argocd-app-of-apps-tree.png" alt="" loading="lazy" width="76" height="48">
+              <img src="screenshots/argocd-podinfo-tree.png" alt="" loading="lazy" width="76" height="48">
+            </span>
+            <span class="proof-btn">
+              <span class="when-closed">View 6 screenshots</span><span class="when-open">Hide screenshots</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
           </summary>
           <div class="gallery" id="gallery">
             <figure class="shot">
@@ -660,13 +703,13 @@
 
     // Screenshots: try local /screenshots first, then the ArgoCD repo's Pages site, then hide the card
     var REMOTE = 'https://msaxena14.github.io/ArgoCD/screenshots/';
-    document.querySelectorAll('.shot img').forEach(function (img) {
+    document.querySelectorAll('.shot img, .peek img').forEach(function (img) {
       img.addEventListener('error', function () {
         if (!img.dataset.retried) {
           img.dataset.retried = '1';
           img.src = REMOTE + img.src.split('/').pop();
         } else {
-          img.closest('figure').hidden = true;
+          var fig = img.closest('figure'); (fig || img).hidden = true;
         }
       });
     });
