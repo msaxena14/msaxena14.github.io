@@ -2,6 +2,7 @@
 severity: Medium · Client staging
 tags: PostgreSQL, Kubernetes, Capacity, Root cause analysis
 date: 2026-10-12
+featured: true
 summary: Synthetic 500s on a user-management service traced to a neighbouring service autoscaling and consuming the shared database's connection slots.
 ---
 ## Symptom

@@ -2,7 +2,8 @@
 """Regenerate the Investigations content from Investigations/*.md.
 
 Each file is one case. The filename (minus .md) is the headline; the file body is the write-up.
-Optional front-matter between '---' lines: severity, tags (comma separated), date (YYYY-MM-DD), summary.
+Optional front-matter between '---' lines: severity, tags (comma separated), date (YYYY-MM-DD), summary,
+featured (true = show as a teaser on the homepage; if no case is featured, the newest one is shown).
 Sections named Symptom / Investigation / Fix / Impact fill the four-step layout; any other
 section is shown full-width below them.
 
@@ -18,7 +19,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "Investigations"
 STEPS = ["Symptom", "Investigation", "Fix", "Impact"]
-HOME_TEASERS = 3
 CHEV = ('<svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" '
         'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>')
 GO = ('<svg class="case-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" '
@@ -130,6 +130,7 @@ def parse(path):
     return {
         "title": title, "slug": slugify(title), "severity": meta.get("severity", ""),
         "tags": tags, "date": meta.get("date", ""), "summary": summary,
+        "featured": meta.get("featured", "").lower() in ("true", "yes", "1"),
         "sections": sections, "order": order,
     }
 
@@ -191,7 +192,7 @@ def main():
 
     replace_region(ROOT / "investigations.html",
                    "\n".join(case_html(c, i == 0) for i, c in enumerate(cases)), 8)
-    shown = cases[:HOME_TEASERS]
+    shown = [c for c in cases if c["featured"]] or cases[:1]
     replace_region(ROOT / "index.html", "\n".join(card_html(c) for c in shown), 8)
 
     index = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -199,7 +200,7 @@ def main():
     index = re.sub(r'(<a class="btn btn-ghost" href="investigations.html">)[^<]*(</a>)',
                    lambda m: m.group(1) + label + m.group(2), index)
     (ROOT / "index.html").write_text(index, encoding="utf-8")
-    print("Built %d case(s); %d on the homepage." % (len(cases), len(shown)))
+    print("Built %d case(s); %d featured on the homepage." % (len(cases), len(shown)))
     for c in cases:
         print(" -", c["date"] or "no date", "|", c["title"])
 
