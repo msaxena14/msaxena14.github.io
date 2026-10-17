@@ -130,20 +130,6 @@
             <ul class="tags" aria-label="Technologies"><li class="tag">PostgreSQL</li><li class="tag">Kubernetes</li><li class="tag">Capacity</li><li class="tag">Root cause analysis</li></ul>
           </div>
         </details>
-        <details class="case" id="outdated-image-tag-fails-configuration-validation-at-startup">
-          <summary>
-            <span class="case-title"><h3>Outdated image tag fails configuration validation at startup</h3><p>A service stuck in a container config error was running a release too old for the environment&#x27;s storage settings.</p></span>
-            <span class="case-sev">Medium · Client prod</span>
-            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-          </summary>
-          <div class="case-body">
-            <div class="step"><h4>Symptom</h4><p>On a client&#x27;s Azure cluster, a service&#x27;s pod was stuck in <code>CreateContainerConfigError</code>.</p></div>
-            <div class="step"><h4>Investigation</h4><p>The alert reported a container configuration problem. Reading the service&#x27;s own startup logs showed the application failing validation of its settings: the storage-type value supplied by the environment was rejected by the running release, which only accepted two named values. Comparing the running image tag with current releases showed it was far behind, and the owning team confirmed which version the environment should run. The feature had already been enabled in a failing state, so the question of whether it was needed at all went back to the owning team.</p></div>
-            <div class="step"><h4>Fix</h4><p>Deployed the correct, newer image tag through a merge request on the client configuration. The owning team agreed to raise a request to offboard the feature if it isn&#x27;t required.</p></div>
-            <div class="step impact"><h4>Impact</h4><p>The pods came up and stayed running with no restarts and no error logs.</p></div>
-            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Azure</li><li class="tag">Configuration</li><li class="tag">Image versions</li></ul>
-          </div>
-        </details>
         <details class="case" id="imagepullbackoff-from-a-chart-default-pointing-at-a-missing-image">
           <summary>
             <span class="case-title"><h3>ImagePullBackOff from a chart default pointing at a missing image</h3><p>A pod stuck in ImagePullBackOff because the chart&#x27;s default image path no longer existed in the registry.</p></span>
