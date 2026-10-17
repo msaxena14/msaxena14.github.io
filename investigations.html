@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investigations | Madhavam Saxena</title>
+<meta name="description" content="Production incidents traced to root cause, written up as short case files by Madhavam Saxena, Site Reliability Engineer.">
+<link rel="canonical" href="https://msaxena14.github.io/investigations.html">
+<meta name="author" content="Madhavam Saxena">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Investigations | Madhavam Saxena">
+<meta property="og:description" content="Production incidents traced to root cause, written up as short case files.">
+<meta property="og:url" content="https://msaxena14.github.io/investigations.html">
+<meta property="og:image" content="https://msaxena14.github.io/madhavam-saxena.jpeg">
+<meta name="twitter:card" content="summary">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f8fb" id="theme-meta">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d4ed8'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' text-anchor='middle' fill='white'%3EMS%3C/text%3E%3C/svg%3E">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Madhavam Saxena",
+  "jobTitle": "Site Reliability Engineer",
+  "worksFor": { "@type": "Organization", "name": "Innovaccer" },
+  "url": "https://msaxena14.github.io/",
+  "email": "mailto:madhavamsaxena14@gmail.com",
+  "sameAs": ["https://www.linkedin.com/in/madhavamsaxena/", "https://github.com/msaxena14"],
+  "knowsAbout": ["Kubernetes", "AWS", "Terraform", "ArgoCD", "GitOps", "Observability", "Site Reliability Engineering"]
+}
+</script>
+
+<!-- Set theme before first paint so there is no flash -->
+<script>
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap">
+
+<link rel="stylesheet" href="site.css">
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="index.html">Madhavam Saxena</a>
+    <nav class="primary" aria-label="Primary">
+      <a href="index.html#experience">Experience</a>
+      <a href="investigations.html" aria-current="true">Investigations</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark theme">
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <a class="btn btn-primary" href="MadhavamSaxena_Resume.pdf" download>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <span><span class="btn-resume-text">Download </span>Resume</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-head">
+    <div class="wrap">
+      <a class="crumb" href="index.html#investigations">← Back to portfolio</a>
+      <h1>Investigations</h1>
+      <p>Production issues I traced to root cause, written up as short case files. Client and environment details are anonymised.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="cases">
+        <details class="case" id="missing-service-callbacks" open>
+          <summary>
+            <span class="case-title">
+              <h3>Missing Kubernetes Service silently breaks customer callbacks</h3>
+              <p>Exports reported success internally, but the customer's callbacks never fired.</p>
+            </span>
+            <span class="case-sev">Critical · Client staging</span>
+            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="case-body">
+            <div class="step">
+              <h4>Symptom</h4>
+              <p>On a client staging environment, customer callback notifications never fired, even though exports were marked successful internally. A Critical ticket was open and the customer was blocked.</p>
+            </div>
+            <div class="step">
+              <h4>Investigation</h4>
+              <p>Both services were healthy, which ruled out crashes and scheduling. The application logs showed repeated DNS failures (<code>Name or service not known</code>) when one service tried to reach another. Checking the cluster confirmed the target had no Kubernetes Service, so nothing could resolve it. The Helm chart only created that Service under a conditional intended for a different network topology, so environments outside that topology never got one.</p>
+            </div>
+            <div class="step">
+              <h4>Fix</h4>
+              <p>Drove a chart change adding an unconditional Service template, reviewed and merged it, and had it deployed through the GitOps pipeline.</p>
+            </div>
+            <div class="step impact">
+              <h4>Impact</h4>
+              <p>DNS resolution was restored, callbacks fired again, and the customer was unblocked.</p>
+            </div>
+            <ul class="tags" aria-label="Technologies">
+              <li class="tag">Kubernetes</li><li class="tag">Helm</li><li class="tag">ArgoCD</li><li class="tag">Log analysis</li><li class="tag">Incident response</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">© <span id="year">2026</span> Madhavam Saxena</div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    var meta = document.getElementById('theme-meta');
+    function syncMeta() { meta.setAttribute('content', root.getAttribute('data-theme') === 'dark' ? '#0b1220' : '#f6f8fb'); }
+    syncMeta();
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      syncMeta();
+    });
+
+    // Deep link: open the case file named in the URL hash
+    function openFromHash() {
+      var el = location.hash && document.querySelector('details.case' + location.hash);
+      if (el) el.open = true;
+    }
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+  })();
+</script>
+</body>
+</html>
