@@ -263,21 +263,39 @@
           <h2>Investigations</h2>
           <p>Production issues I traced to root cause, written up as short case files. Client and environment details are anonymised.</p>
         </div>
-        <a class="btn btn-ghost" href="investigations.html">All investigations →</a>
+        <a class="btn btn-ghost" href="investigations.html">All investigations (5) →</a>
       </div>
 
       <div class="cases">
-        <a class="case-card" href="investigations.html#missing-service-callbacks">
+        <!-- INVESTIGATIONS:START -->
+        <a class="case-card" href="investigations.html#missing-kubernetes-service-silently-breaks-customer-callbacks">
           <span class="case-title">
             <h3>Missing Kubernetes Service silently breaks customer callbacks</h3>
-            <p>Exports reported success internally, but the customer's callbacks never fired. Traced to a Helm chart that only created the Service under one network topology.</p>
-            <ul class="tags" aria-label="Technologies">
-              <li class="tag">Kubernetes</li><li class="tag">Helm</li><li class="tag">ArgoCD</li><li class="tag">Incident response</li>
-            </ul>
+            <p>Exports reported success internally, but the customer&#x27;s callbacks never fired. Traced to a Helm chart that only created the Service under one network topology.</p>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Helm</li><li class="tag">ArgoCD</li><li class="tag">Log analysis</li></ul>
           </span>
           <span class="case-sev">Critical · Client staging</span>
           <svg class="case-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
+        <a class="case-card" href="investigations.html#misleading-allow-list-error-hides-a-stale-image-tag">
+          <span class="case-title">
+            <h3>Misleading allow-list error hides a stale image tag</h3>
+            <p>A pod restarted 12,000+ times behind an &quot;IP not whitelisted&quot; error. The allow-list was fine; a very old image tag was the real cause.</p>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Azure</li><li class="tag">Troubleshooting</li><li class="tag">Image versions</li></ul>
+          </span>
+          <span class="case-sev">Medium · Client prod</span>
+          <svg class="case-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="case-card" href="investigations.html#autoscaled-neighbour-exhausts-the-shared-database-connection-slots">
+          <span class="case-title">
+            <h3>Autoscaled neighbour exhausts the shared database connection slots</h3>
+            <p>Synthetic 500s on a user-management service traced to a neighbouring service autoscaling and consuming the shared database&#x27;s connection slots.</p>
+            <ul class="tags" aria-label="Technologies"><li class="tag">PostgreSQL</li><li class="tag">Kubernetes</li><li class="tag">Capacity</li><li class="tag">Root cause analysis</li></ul>
+          </span>
+          <span class="case-sev">Medium · Client staging</span>
+          <svg class="case-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <!-- INVESTIGATIONS:END -->
       </div>
     </div>
   </section>

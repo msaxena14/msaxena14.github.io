@@ -87,37 +87,78 @@
   <section>
     <div class="wrap">
       <div class="cases">
-        <details class="case" id="missing-service-callbacks" open>
+        <!-- INVESTIGATIONS:START -->
+        <details class="case" id="missing-kubernetes-service-silently-breaks-customer-callbacks" open>
           <summary>
-            <span class="case-title">
-              <h3>Missing Kubernetes Service silently breaks customer callbacks</h3>
-              <p>Exports reported success internally, but the customer's callbacks never fired.</p>
-            </span>
+            <span class="case-title"><h3>Missing Kubernetes Service silently breaks customer callbacks</h3><p>Exports reported success internally, but the customer&#x27;s callbacks never fired. Traced to a Helm chart that only created the Service under one network topology.</p></span>
             <span class="case-sev">Critical · Client staging</span>
             <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
           </summary>
           <div class="case-body">
-            <div class="step">
-              <h4>Symptom</h4>
-              <p>On a client staging environment, customer callback notifications never fired, even though exports were marked successful internally. A Critical ticket was open and the customer was blocked.</p>
-            </div>
-            <div class="step">
-              <h4>Investigation</h4>
-              <p>Both services were healthy, which ruled out crashes and scheduling. The application logs showed repeated DNS failures (<code>Name or service not known</code>) when one service tried to reach another. Checking the cluster confirmed the target had no Kubernetes Service, so nothing could resolve it. The Helm chart only created that Service under a conditional intended for a different network topology, so environments outside that topology never got one.</p>
-            </div>
-            <div class="step">
-              <h4>Fix</h4>
-              <p>Drove a chart change adding an unconditional Service template, reviewed and merged it, and had it deployed through the GitOps pipeline.</p>
-            </div>
-            <div class="step impact">
-              <h4>Impact</h4>
-              <p>DNS resolution was restored, callbacks fired again, and the customer was unblocked.</p>
-            </div>
-            <ul class="tags" aria-label="Technologies">
-              <li class="tag">Kubernetes</li><li class="tag">Helm</li><li class="tag">ArgoCD</li><li class="tag">Log analysis</li><li class="tag">Incident response</li>
-            </ul>
+            <div class="step"><h4>Symptom</h4><p>On a client staging environment, customer callback notifications never fired, even though exports were marked successful internally. A Critical ticket was open and the customer was blocked.</p></div>
+            <div class="step"><h4>Investigation</h4><p>Both services were healthy, which ruled out crashes and scheduling. The application logs showed repeated DNS failures (<code>Name or service not known</code>) when one service tried to reach another. Checking the cluster confirmed the target had no Kubernetes Service, so nothing could resolve it. The Helm chart only created that Service under a conditional intended for a different network topology, so environments outside that topology never got one.</p></div>
+            <div class="step"><h4>Fix</h4><p>Drove a chart change adding an unconditional Service template, reviewed and merged it, and had it deployed through the GitOps pipeline.</p></div>
+            <div class="step impact"><h4>Impact</h4><p>DNS resolution was restored, callbacks fired again, and the customer was unblocked.</p></div>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Helm</li><li class="tag">ArgoCD</li><li class="tag">Log analysis</li><li class="tag">Incident response</li></ul>
           </div>
         </details>
+        <details class="case" id="misleading-allow-list-error-hides-a-stale-image-tag">
+          <summary>
+            <span class="case-title"><h3>Misleading allow-list error hides a stale image tag</h3><p>A pod restarted 12,000+ times behind an &quot;IP not whitelisted&quot; error. The allow-list was fine; a very old image tag was the real cause.</p></span>
+            <span class="case-sev">Medium · Client prod</span>
+            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="case-body">
+            <div class="step"><h4>Symptom</h4><p>A pod on a client&#x27;s Azure cluster had restarted more than 12,000 times, a long-standing condition rather than a new regression. Its logs ended in <code>ConnectionError: Customer IP is not whitelisted</code> against an Azure OpenAI endpoint.</p></div>
+            <div class="step"><h4>Investigation</h4><p>The error read like a network allow-list gap, and the first step was to ask for the client&#x27;s egress IP. A teammate questioned that: the service calls the endpoint from the cluster, not from the customer&#x27;s network. Checking the cluster&#x27;s NAT gateway address against the endpoint&#x27;s network rules showed it was already allow-listed, which disproved the hypothesis. With networking ruled out, comparing the deployed version with current releases showed the service was running a very old image tag, and together with the owning team that became the most likely cause.</p></div>
+            <div class="step"><h4>Fix</h4><p>Upgraded the service to a current release through the GitOps configuration.</p></div>
+            <div class="step impact"><h4>Impact</h4><p>The pods came up and stayed up with no restarts, ending a restart loop that had run for more than two weeks.</p></div>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Azure</li><li class="tag">Troubleshooting</li><li class="tag">Image versions</li></ul>
+          </div>
+        </details>
+        <details class="case" id="autoscaled-neighbour-exhausts-the-shared-database-connection-slots">
+          <summary>
+            <span class="case-title"><h3>Autoscaled neighbour exhausts the shared database connection slots</h3><p>Synthetic 500s on a user-management service traced to a neighbouring service autoscaling and consuming the shared database&#x27;s connection slots.</p></span>
+            <span class="case-sev">Medium · Client staging</span>
+            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="case-body">
+            <div class="step"><h4>Symptom</h4><p>Synthetic checks against a staging user-management service started returning HTTP 500. The service&#x27;s logs showed Postgres refusing connections: <code>remaining connection slots are reserved for roles with the SUPERUSER attribute</code>.</p></div>
+            <div class="step"><h4>Investigation</h4><p>That error means the database has run out of regular connection slots, so the question was who was holding them. A traffic spike on a separate document-processing service had scaled it to about 27 pods. Each pod keeps its own connection pool of roughly 10 connections, around 291 in total, against a server limit of 401. With about 384 connections in use, user management lost the race for the last slots. The headroom was only a few connections, so the next spike would repeat the failure.</p></div>
+            <div class="step"><h4>Fix</h4><p>Recommended three options, in order of effort: cap the per-pod pool size, raise <code>max_connections</code>, and put a connection pooler such as PgBouncer between the applications and the database. The owning application team applied the fix under a separate ticket.</p></div>
+            <div class="step impact"><h4>Impact</h4><p>The incident was closed with a documented root cause and a clear way to stop it recurring on the next traffic spike.</p></div>
+            <ul class="tags" aria-label="Technologies"><li class="tag">PostgreSQL</li><li class="tag">Kubernetes</li><li class="tag">Capacity</li><li class="tag">Root cause analysis</li></ul>
+          </div>
+        </details>
+        <details class="case" id="outdated-image-tag-fails-configuration-validation-at-startup">
+          <summary>
+            <span class="case-title"><h3>Outdated image tag fails configuration validation at startup</h3><p>A service stuck in a container config error was running a release too old for the environment&#x27;s storage settings.</p></span>
+            <span class="case-sev">Medium · Client prod</span>
+            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="case-body">
+            <div class="step"><h4>Symptom</h4><p>On a client&#x27;s Azure cluster, a service&#x27;s pod was stuck in <code>CreateContainerConfigError</code>.</p></div>
+            <div class="step"><h4>Investigation</h4><p>The alert reported a container configuration problem. Reading the service&#x27;s own startup logs showed the application failing validation of its settings: the storage-type value supplied by the environment was rejected by the running release, which only accepted two named values. Comparing the running image tag with current releases showed it was far behind, and the owning team confirmed which version the environment should run. The feature had already been enabled in a failing state, so the question of whether it was needed at all went back to the owning team.</p></div>
+            <div class="step"><h4>Fix</h4><p>Deployed the correct, newer image tag through a merge request on the client configuration. The owning team agreed to raise a request to offboard the feature if it isn&#x27;t required.</p></div>
+            <div class="step impact"><h4>Impact</h4><p>The pods came up and stayed running with no restarts and no error logs.</p></div>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">Azure</li><li class="tag">Configuration</li><li class="tag">Image versions</li></ul>
+          </div>
+        </details>
+        <details class="case" id="imagepullbackoff-from-a-chart-default-pointing-at-a-missing-image">
+          <summary>
+            <span class="case-title"><h3>ImagePullBackOff from a chart default pointing at a missing image</h3><p>A pod stuck in ImagePullBackOff because the chart&#x27;s default image path no longer existed in the registry.</p></span>
+            <span class="case-sev">Medium · Client prod</span>
+            <svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <div class="case-body">
+            <div class="step"><h4>Symptom</h4><p>A UI-shell service sat in <code>ImagePullBackOff</code> for the whole alert window on a client&#x27;s production cluster.</p></div>
+            <div class="step"><h4>Investigation</h4><p>The pull error and a look at the registry showed that the referenced image path and tag did not exist at all, so retries could never succeed. The path came from the chart&#x27;s default values, not from anything specific to the client. A platform engineer confirmed the service shouldn&#x27;t use that default and supplied the correct repository and tag.</p></div>
+            <div class="step"><h4>Fix</h4><p>Added a per-client override for the image repository and tag, merged it, promoted it, and let the GitOps sync roll it out.</p></div>
+            <div class="step impact"><h4>Impact</h4><p>The deployment synced and went healthy, with pods running without restarts or errors. The UI was checked after logging in to confirm it served correctly.</p></div>
+            <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">ECR</li><li class="tag">Helm</li><li class="tag">ArgoCD</li></ul>
+          </div>
+        </details>
+        <!-- INVESTIGATIONS:END -->
       </div>
     </div>
   </section>
