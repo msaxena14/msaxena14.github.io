@@ -9,7 +9,7 @@ section is shown full-width below them.
 
 Run from the repo root:  python3 scripts/build_investigations.py
 Rewrites the regions between the INVESTIGATIONS:START / INVESTIGATIONS:END markers in
-investigations.html and index.html. Standard library only.
+html/investigations.html and html/index.html. Standard library only.
 """
 import html
 import re
@@ -190,16 +190,16 @@ def main():
     cases = [parse(f) for f in files]
     cases.sort(key=lambda c: (c["date"], c["title"]), reverse=True)
 
-    replace_region(ROOT / "investigations.html",
+    replace_region(ROOT / "html" / "investigations.html",
                    "\n".join(case_html(c, i == 0) for i, c in enumerate(cases)), 8)
     shown = [c for c in cases if c["featured"]] or cases[:1]
-    replace_region(ROOT / "index.html", "\n".join(card_html(c) for c in shown), 8)
+    replace_region(ROOT / "html" / "index.html", "\n".join(card_html(c) for c in shown), 8)
 
-    index = (ROOT / "index.html").read_text(encoding="utf-8")
+    index = (ROOT / "html" / "index.html").read_text(encoding="utf-8")
     label = "All investigations (%d) →" % len(cases)
     index = re.sub(r'(<a class="btn btn-ghost" href="investigations.html">)[^<]*(</a>)',
                    lambda m: m.group(1) + label + m.group(2), index)
-    (ROOT / "index.html").write_text(index, encoding="utf-8")
+    (ROOT / "html" / "index.html").write_text(index, encoding="utf-8")
     print("Built %d case(s); %d featured on the homepage." % (len(cases), len(shown)))
     for c in cases:
         print(" -", c["date"] or "no date", "|", c["title"])

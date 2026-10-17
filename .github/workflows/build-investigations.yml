@@ -28,12 +28,12 @@ jobs:
 
       - name: Commit regenerated pages
         run: |
-          if git diff --quiet -- investigations.html index.html; then
+          if git diff --quiet -- html/investigations.html html/index.html; then
             echo "No changes to commit."
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add investigations.html index.html
+            git add html/investigations.html html/index.html
             git commit -m "Rebuild investigations pages"
             git push
           fi
