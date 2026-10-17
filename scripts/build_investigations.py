@@ -7,7 +7,7 @@ featured (true = show as a teaser on the homepage; if no case is featured, the n
 Sections named Symptom / Investigation / Fix / Impact fill the four-step layout; any other
 section is shown full-width below them.
 
-Run from the repo root:  python3 build_investigations.py
+Run from the repo root:  python3 scripts/build_investigations.py
 Rewrites the regions between the INVESTIGATIONS:START / INVESTIGATIONS:END markers in
 investigations.html and index.html. Standard library only.
 """
@@ -16,7 +16,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "Investigations"
 STEPS = ["Symptom", "Investigation", "Fix", "Impact"]
 CHEV = ('<svg class="case-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" '

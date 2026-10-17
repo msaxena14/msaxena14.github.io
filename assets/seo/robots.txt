@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://msaxena14.github.io/assets/seo/sitemap.xml
