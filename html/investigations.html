@@ -152,7 +152,7 @@
           </summary>
           <div class="case-body">
             <div class="step"><h4>Symptom</h4><p>A UI-shell service sat in <code>ImagePullBackOff</code> for the whole alert window on a client&#x27;s production cluster.</p></div>
-            <div class="step"><h4>Investigation</h4><p>The pull error and a look at the registry showed that the referenced image path and tag did not exist at all, so retries could never succeed. The path came from the chart&#x27;s default values, not from anything specific to the client. A platform engineer confirmed the service shouldn&#x27;t use that default and supplied the correct repository and tag.</p></div>
+            <div class="step"><h4>Investigation</h4><p>The ImagePull error and ECR registry showed that the referenced image path and tag did not exist at all, so retries could never succeed. The path came from the chart&#x27;s default values, not from anything specific to the client. A developer confirmed the service shouldn&#x27;t use that default and supplied the correct repository and tag.</p></div>
             <div class="step"><h4>Fix</h4><p>Added a per-client override for the image repository and tag, merged it, promoted it, and let the GitOps sync roll it out.</p></div>
             <div class="step impact"><h4>Impact</h4><p>The deployment synced and went healthy, with pods running without restarts or errors. The UI was checked after logging in to confirm it served correctly.</p></div>
             <ul class="tags" aria-label="Technologies"><li class="tag">Kubernetes</li><li class="tag">ECR</li><li class="tag">Helm</li><li class="tag">ArgoCD</li></ul>
